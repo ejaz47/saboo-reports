@@ -150,6 +150,7 @@ table tr td {
 .subpage .main .content .block .block-header {
     border-bottom: 1px solid;
     padding: 3px 0px;
+    padding-left: 80px;
 }
 
 

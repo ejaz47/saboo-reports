@@ -51,7 +51,7 @@ function GazzetGenerator() {
             return `
                 <div class="block">
                     <div class="block-header">
-                        <table style="text-align: left; margin-left: 80px;">
+                        <table style="text-align: left">
                             <tr>
                                 <td width="50px">PRN No: </td>
                                 <td width="70px">${student.prn_no}</td>
