@@ -1,6 +1,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="ejaz.rpt.css">
+        <link rel="stylesheet" href="marksheet.rpt.css">
         <script src="jquery.3.min.js"></script>
         <script src="ejaz.rpt.js"></script>
         <script src="sample.data.js"></script>
@@ -21,7 +22,16 @@
                 return val && val !== "--" ? val : "";
             }
 
-            function getFormattedCourses(item) {
+            function getFormattedCourses(item, subjects) {
+                // we have student details in key value pairs of database
+                // e.g. {
+                //     "sub1_marks": "12"
+                //     "sub1_total": "12"
+                //     "sub2_marks": "12"
+                //     "sub2_total": "12"
+                // }
+                
+                // get object of groupby "sub[n]_[-----]"
                 const courses = {};
                 Object.keys(item).forEach(key => {
                     // if key starts with 'sub\d'
@@ -34,11 +44,12 @@
                     }
                 });
 
-                // convert courses object to array
+                // convert courses object into an array
                 const coursesArray = Object.keys(courses).sort((a, b) => parseInt(a) - parseInt(b)).map(ckey => {
                     return courses[ckey];
                 });
-                // split coursesArray into types
+
+                // split coursesArray into types (Theory(IA/ESE) and Termwork/practical(TW/PR/OR))
                 const splittesCourses = [];
                 coursesArray.forEach(item => {
                     if (item["creditassigned_IAESE"] && item["creditassigned_IAESE"] !== "--") {
@@ -70,7 +81,76 @@
                         });
                     }
                 });
-                return splittesCourses;
+
+                // Assign subject info like name,code to each splitted course
+                const splittesCoursesWithSubject = splittesCourses.map((item, index) => {
+                    item.courseDetails = subjects[index];
+                    item.code = item.courseDetails.code;
+                    item.name = item.courseDetails.name;
+                    return item;
+                });
+
+                // group all cources by subject code
+                const finalCourses = {};
+                splittesCoursesWithSubject.forEach(item => {
+                    if (!finalCourses[item.code]) {
+                        finalCourses[item.code] = [];
+                    }
+                    // if tw/pr/or then split marks1 and marks2 into rows
+                    if (item.type === "TW/PR/OR") {
+                        if (item.marks1) {
+                            finalCourses[item.code].push({
+                                type: "TW",
+                                marks1: "",
+                                marks2: item.marks1,
+                                grade1: "",
+                                grade2: item.grade1,
+                                marksTotal: item.marks1,
+                                c: item.c,
+                                g: item.g,
+                                gp: item.gp,
+                                cgp: item.cgp,
+                                code: item.code,
+                                name: item.name,
+                                courseDetails: {
+                                    marksMin1: "",
+                                    marksMin2: item.courseDetails.marksMin1,
+                                    marksMax1: "",
+                                    marksMax2: item.courseDetails.marksMax1,
+                                    marksTotal: item.courseDetails.marksMax1
+                                }
+                            });
+                        }
+
+                        if (item.marks2) {
+                            finalCourses[item.code].push({
+                                type: "P/O",
+                                marks1: "",
+                                marks2: item.marks2,
+                                grade1: "",
+                                grade2: item.grade2,
+                                marksTotal: item.marks2,
+                                c: item.c,
+                                g: item.g,
+                                gp: item.gp,
+                                cgp: item.cgp,
+                                code: item.code,
+                                name: item.name,
+                                courseDetails: {
+                                    marksMin1: "",
+                                    marksMin2: item.courseDetails.marksMin2,
+                                    marksMax1: "",
+                                    marksMax2: item.courseDetails.marksMax2,
+                                    marksTotal: item.courseDetails.marksMax2
+                                }
+                            });
+                        }
+                    } else {
+                        finalCourses[item.code].push(item);
+                    }
+                });
+
+                return finalCourses;
             }
 
             function getFormattedHeaderCourses(courses) {
@@ -161,10 +241,11 @@
 
             function loadGazzeteDocument() {
                 var data = {
-                    perPage: 4,
+                    perPage: 1,
                     headers: {
                         isHeader: true,
                         title: "",
+                        year: "",
                         courses: [],
                         totals: {
                             CGPI: "CGPI",
@@ -181,9 +262,12 @@
                     }
                 };
                 
+                // Format subjects list
+                var formattedSubjects = getFormattedHeaderCourses(subjectsData);
+
                 // Format students list
                 var formattedStudents = studentsData.map(item => {
-                    const courses = getFormattedCourses(item);
+                    const courses = getFormattedCourses(item, formattedSubjects);
                     return {
                         examinationType: item["partwhole"] === "PART" ? "Part Examination" : "Whole Examination",
                         prn_no: item["prn_no"],
@@ -202,9 +286,6 @@
                     };
                 });
 
-                // Format subjects list
-                var formattedSubjects = getFormattedHeaderCourses(subjectsData);
-
                 data.students = formattedStudents;
                 data.headers.courses = formattedSubjects;
                 data.footer.courses = subjectsData.map(item => {
@@ -214,13 +295,13 @@
                 // header title
                 data.headers.title = `${docInfo.semester === "Sem III" || docInfo.semester === "Sem IV" ? "Second Year" : "Third Year"}`;
                 data.headers.title += ` ${docInfo.branch} - Semester ${docInfo.semester.substr(4)} (C-Scheme-R-2019)`;
-                data.headers.title += ` EXAMINATION HELD IN ${docInfo.year}`;
                 data.headers.title = data.headers.title.toUpperCase();
+                data.headers.year = docInfo.year;
 
                 //document titlte name update
                 document.title = `${docInfo.branch}-${docInfo.semester}-${docInfo.year}`;
                 
-                const gazzetGenerator = new GazzetGenerator();
+                const gazzetGenerator = new MarksheetGererator();
                 const $book = gazzetGenerator.init(data);
                 $(".book").html($book.html());
             }

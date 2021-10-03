@@ -1,0 +1,137 @@
+@page {
+    size: A4 portrait;
+    margin: 0;
+}
+@media print {
+    .page {
+        zoom: 100% !important;
+        margin: 0;
+        border: initial;
+        border-radius: initial;
+        width: initial;
+        min-height: initial;
+        box-shadow: initial;
+        background: initial;
+        page-break-after: always;
+    }
+
+    body {
+        background-color: #fff !important;
+    }
+    .non-printable { display: none; }
+}
+
+* {
+    border-color: #5757577a !important;
+}
+
+.page {
+    width: 21cm;
+    height: 29.6cm;
+    zoom: 100%;
+}
+
+
+/* Main marks table */
+.main-table {
+    border: 1px solid;
+    height: auto;
+    font-size: 9px;
+}
+.main-table tr {
+    border: 1px solid;
+}
+.main-table tr th, .main-table tr td{
+    border: 1px solid;
+    width: 5%;
+    padding: 4px;
+}
+.main-table tr th.paper-name, .main-table tr td.paper-name {
+    width: 50%;
+}
+.main-table tr td.paper-name {
+    text-align: left;
+}
+
+
+/* Header */
+.header {
+    height: auto;
+    margin-top: 100px;
+    margin-bottom: 15px;
+}
+.header-table tr {
+    border: none;
+}
+.header-table th {
+    text-align: left;
+    text-transform: uppercase;
+    padding: 6px 0px;
+    font-weight: 900;
+}
+.header-table th.key {
+    color: red;
+    padding-right: 4px;
+}
+.header-table th.value {
+    padding-left: 10px;
+}
+.header-table th.title {
+    text-align: center;
+    padding-bottom: 15px;
+    text-decoration: underline;
+}
+.header-table tr.prn-absolute {
+    position: absolute;
+    right: 0;
+    bottom: -4px;
+}
+.header-table tr.prn-absolute .key{
+    padding-right: 10px;
+}
+
+
+/* footer */
+.footer {
+    padding: 0px;
+    border: none;
+    min-height: auto;
+    position: relative;
+}
+.footer .abbreviations {
+    border: 1px solid;
+    padding: 5px;
+}
+.footer .box {
+    width: 200px;
+    margin-top: 10px;
+    font: 11px "Arial";
+    font-weight: 900;
+    display: flex;
+    flex-direction: column;
+}
+.footer .box .row{
+    display: flex;
+    padding: 4px 0px;
+}
+.footer .box .row.incharge, .footer .box .row.principal{
+    position: absolute;
+    bottom: 0;
+}
+.footer .box .row.incharge{
+    left: 300px;
+}
+.footer .box .row.principal{
+    left: 600px;
+}
+.footer .box .row .key{
+    color: red;
+    padding-right: 2px;
+}
+.footer .box .row .value{
+    flex: 1;
+}
+.footer .box .row .value .line{
+    border-bottom: 1px solid black;
+    margin-left: 6px;
+}

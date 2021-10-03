@@ -1,3 +1,49 @@
+function enableControls () {
+    let time = 1000;
+    let timer;
+    const elements = `
+        <a href="#" class="float-plus non-printable"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 10h-3v3h-2v-3h-3v-2h3v-3h2v3h3v2zm8.172 14l-7.387-7.387c-1.388.874-3.024 1.387-4.785 1.387-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9c0 1.761-.514 3.398-1.387 4.785l7.387 7.387-2.828 2.828zm-12.172-8c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7z"/></svg></a>
+        <a href="#" class="float-minus non-printable"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 10h-8v-2h8v2zm8.172 14l-7.387-7.387c-1.388.874-3.024 1.387-4.785 1.387-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9c0 1.761-.514 3.398-1.387 4.785l7.387 7.387-2.828 2.828zm-12.172-8c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7z"/></svg></a>
+        <a href="#" class="float-print non-printable"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 11v12h-24v-12h4v-10h10.328c1.538 0 5.672 4.852 5.672 6.031v3.969h4zm-6-3.396c0-1.338-2.281-1.494-3.25-1.229.453-.813.305-3.375-1.082-3.375h-7.668v13h12v-8.396zm-2 5.396h-8v-1h8v1zm0-3h-8v1h8v-1zm0-2h-8v1h8v-1z"/></svg></a>
+    `;
+    $("body").append(elements);
+
+    function handlerIn() {
+        clearTimeout(timer);
+        $(".float-plus, .float-minus, .float-print").stop(true).css('opacity', 1).show();
+    }
+    function handlerOut() {
+        timer = setTimeout(function() {
+            $(".float-plus, .float-minus, .float-print").animate({opacity: 0}, 3000);
+        }, time);
+    }
+
+    // events
+    $("body").on("mousemove", ".float-plus, .float-minus, .float-print", () => {
+        handlerIn();
+    });
+    $("body").on("mouseleave", ".float-plus, .float-minus, .float-print", () => {
+        handlerOut();
+    });
+
+    let zoomFact = 75;
+    $("body").on("click", ".float-plus", (e) => {
+        e.preventDefault();
+        zoomFact = zoomFact + 25;
+        zoomFact = zoomFact > 99 ? 100 : zoomFact;
+        $(".page").css("zoom", zoomFact + "%");
+    });
+    $("body").on("click", ".float-minus", (e) => {
+        e.preventDefault();
+        zoomFact = zoomFact - 25;
+        zoomFact = zoomFact < 50 ? 50 : zoomFact;
+        $(".page").css("zoom", zoomFact + "%");
+    });
+    $("body").on("click", ".float-print", (e) => {
+        e.preventDefault();
+        window.print();
+    });
+}
 
 function GazzetGenerator() {
     const htmls = {
@@ -172,8 +218,6 @@ function GazzetGenerator() {
     let pageCount = 1;
     let totalPages = 0;
     let maxCourseCount = 0;
-    let time = 1000;
-    let timer;
 
     function getCourseRows (header, classes="") {
         let $mainSubHeader = $("<div></div>");
@@ -287,57 +331,12 @@ function GazzetGenerator() {
            return acc;
         }, {});
     }
-    
-    function enableControls () {
-        const elements = `
-            <a href="#" class="float-plus non-printable"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 10h-3v3h-2v-3h-3v-2h3v-3h2v3h3v2zm8.172 14l-7.387-7.387c-1.388.874-3.024 1.387-4.785 1.387-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9c0 1.761-.514 3.398-1.387 4.785l7.387 7.387-2.828 2.828zm-12.172-8c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7z"/></svg></a>
-            <a href="#" class="float-minus non-printable"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 10h-8v-2h8v2zm8.172 14l-7.387-7.387c-1.388.874-3.024 1.387-4.785 1.387-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9c0 1.761-.514 3.398-1.387 4.785l7.387 7.387-2.828 2.828zm-12.172-8c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7z"/></svg></a>
-            <a href="#" class="float-print non-printable"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 11v12h-24v-12h4v-10h10.328c1.538 0 5.672 4.852 5.672 6.031v3.969h4zm-6-3.396c0-1.338-2.281-1.494-3.25-1.229.453-.813.305-3.375-1.082-3.375h-7.668v13h12v-8.396zm-2 5.396h-8v-1h8v1zm0-3h-8v1h8v-1zm0-2h-8v1h8v-1z"/></svg></a>
-        `;
-        $("body").append(elements);
-
-        function handlerIn() {
-            clearTimeout(timer);
-            $(".float-plus, .float-minus, .float-print").stop(true).css('opacity', 1).show();
-        }
-        function handlerOut() {
-            timer = setTimeout(function() {
-                $(".float-plus, .float-minus, .float-print").animate({opacity: 0}, 3000);
-            }, time);
-        }
-
-        // events
-        $("body").on("mousemove", ".float-plus, .float-minus, .float-print", () => {
-            handlerIn();
-        });
-        $("body").on("mouseleave", ".float-plus, .float-minus, .float-print", () => {
-            handlerOut();
-        });
-
-        let zoomFact = 75;
-        $("body").on("click", ".float-plus", (e) => {
-            e.preventDefault();
-            zoomFact = zoomFact + 25;
-            zoomFact = zoomFact > 99 ? 100 : zoomFact;
-            $(".page").css("zoom", zoomFact + "%");
-        });
-        $("body").on("click", ".float-minus", (e) => {
-            e.preventDefault();
-            zoomFact = zoomFact - 25;
-            zoomFact = zoomFact < 50 ? 50 : zoomFact;
-            $(".page").css("zoom", zoomFact + "%");
-        });
-        $("body").on("click", ".float-print", (e) => {
-            e.preventDefault();
-            window.print();
-        });
-    }
 
     function setMaxCoursesCount (courses) {
         const iaeseCount = courses.filter(item => item.type === "IA/ESE").length;
         const twprCount = courses.filter(item => item.type === "TW/PR/OR").length;
         const maxCount = iaeseCount > twprCount ? iaeseCount : twprCount;
-        console.log(iaeseCount, twprCount, maxCount, courses);
+        // console.log(iaeseCount, twprCount, maxCount, courses);
         maxCourseCount = maxCount > 7 ? 7 : (maxCount < 6 ? 5 : maxCount);
     }
 
@@ -374,3 +373,247 @@ function GazzetGenerator() {
 
     return { init };
 };
+
+function MarksheetGererator () {
+
+    const htmls = {
+        page: () => {
+            return `
+                <div class="page">
+                    <div class="subpage">
+                        <div class="header"></div>
+                        <div class="main"></div>
+                        <div class="totals"></div>
+                        <div class="backlog"></div>
+                        <div class="footer"></div>
+                    </div>
+                </div>
+            `;
+        },
+        main: ({courses}) => {
+            // console.log(student);
+            const getPaperType = function (type) {
+                return type === "IA/ESE" ? "TH" : (type === "P/O" ? "P/O" : "TW");
+            };
+            const getMinMaxText = (min, max) => {
+                return min ? `${min}/${max}` : "--";
+            };
+            const getSubjectText = (name, type) => {
+                name = name.replace("(TW)", "").replace("(IA)", "").trim();
+                return `${name} ${type === "IA/ESE" ? "" : "(TW/PR/OR)"}`;
+            };
+
+            let table = `<table class="main-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Paper Code</th>
+                                <th rowspan="2" class="paper-name">Paper Name</th>
+                                <th rowspan="2">AM</th>
+                                <th colspan="3">UA</th>
+                                <th colspan="3">CA</th>
+                                <th colspan="2">Total</th>
+                                <th rowspan="2">Cr</th>
+                                <th rowspan="2">Gr</th>
+                                <th rowspan="2">GP</th>
+                                <th rowspan="2">EGP</th>
+                                <th rowspan="2">Rmk</th>
+                            </tr>
+                            <tr>
+                                <th>Min/Max</th>
+                                <th>Obt</th>
+                                <th>Exm</th>
+                                <th>Min/Max</th>
+                                <th>Obt</th>
+                                <th>Exm</th>
+                                <th>Max</th>
+                                <th>Obt</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            Object.keys(courses).forEach(key => {
+                const papers = courses[key];
+                const paperCount = papers.length;
+                papers.forEach((paper, index) => {
+
+                    const {
+                        marksMin1,
+                        marksMin2,
+                        marksMax1,
+                        marksMax2,
+                        marksTotal
+                    } = paper.courseDetails;
+
+                    const nextPaper = papers[index + 1];
+                    const lastPaper = papers[index - 1];
+                    let gradeColumns = `
+                        <td>${paper.c}</td>
+                        <td>${paper.g}</td>
+                        <td>${paper.gp}</td>
+                        <td>${paper.cgp}</td>
+                    `;
+                    console.log(paper.type, nextPaper)
+                    if (paper.type === "TW" && nextPaper && nextPaper.type === "P/O") {
+                        const twopRowspan = 2;
+                        gradeColumns = `
+                            <td rowspan="${twopRowspan}">${paper.c}</td>
+                            <td rowspan="${twopRowspan}">${paper.g}</td>
+                            <td rowspan="${twopRowspan}">${paper.gp}</td>
+                            <td rowspan="${twopRowspan}">${paper.cgp}</td>
+                        `;
+                    } else if (paper.type === "P/O" && lastPaper && lastPaper.type === "TW") {
+                        gradeColumns = "";
+                    }
+
+                    if (index === 0) {
+                        table += `
+                            <tr>
+                                <td rowspan="${paperCount}">${paper.code}</td>
+                                <td class="paper-name" rowspan="${paperCount}">${getSubjectText(paper.name, paper.type)}</td>
+                                <td>${getPaperType(paper.type)}</td>
+                                <td>${getMinMaxText(marksMin1, marksMax1)}</td>
+                                <td>${paper.marks1 || "--"}</td>
+                                <td>${paper.grade1 || "--"}</td>
+                                <td>${getMinMaxText(marksMin2, marksMax2)}</td>
+                                <td>${paper.marks2 || "--"}</td>
+                                <td>${paper.grade2 || "--"}</td>
+                                <td>${marksTotal}</td>
+                                <td>${paper.marksTotal}</td>
+                                ${gradeColumns}
+                                <td>--</td>
+                            </tr>`;
+                    } else {
+                        table += `
+                            <tr>
+                                <td>${getPaperType(paper.type)}</td>
+                                <td>${getMinMaxText(marksMin1, marksMax1)}</td>
+                                <td>${paper.marks1 || "--"}</td>
+                                <td>${paper.grade1 || "--"}</td>
+                                <td>${getMinMaxText(marksMin2, marksMax2)}</td>
+                                <td>${paper.marks2 || "--"}</td>
+                                <td>${paper.grade2 || "--"}</td>
+                                <td>${marksTotal}</td>
+                                <td>${paper.marksTotal}</td>
+                                ${gradeColumns}
+                                <td>--</td>
+                            </tr>`;
+                    }
+                });
+                // const {} = 
+            });
+
+            table += `</tbody></table>`;
+            return table;
+        },
+        totals: () => {
+            return ``;
+        },
+        backlog: () => {
+            return `
+
+            `;
+        },
+        footer: () => {
+            return `
+                <div class="abbreviations">
+                    Abbreviations: Gr: Grade. SGPA: Semester Grade Point Average. CGPA: Cumulative Grade Point Average. EGP:
+                    Earned Grade Points. E: Exempted, C:Current Appearance, X: Past Performance. N: Not Exempted, F: Head Failure,
+                    AB: Absent, / - Female, # 0.299 – Sport Benefit, ~ - Dyslexia Benefit, - - Not Applicable_
+                </div>
+                <div class="box">
+                    <div class="row">
+                        <div class="key">Prepared by</div>
+                        <div class="value">:<div class="line"></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Verified by</div>
+                        <div class="value">:<div class="line"></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Date</div>
+                        <div class="value">:<div class="line"></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Place</div>
+                        <div class="value">: MUMBAI<div class="line"></div></div>
+                    </div>
+                    <div class="row incharge">
+                        <div class="key">INCHARGE EXAMINATIONS</div>
+                    </div>
+                    <div class="row principal">
+                        <div class="key">PRINCIPAL</div>
+                    </div>
+                </div>
+            `;
+        },
+        header: ({title, year}, {seat_no, prn_no, name}) => {
+            return `
+                <table class="header-table">
+                    <thead>
+                        <tr>
+                            <th class="title" colspan="3">Cirtificate Showing the Result Of the Candidate</th>
+                        </tr>
+                        <tr>
+                            <th class="key">Name</th>
+                            <th class="divider">:</th>
+                            <th class="value" colspan="3">${name}</th>
+                        </tr>
+                        <tr>
+                            <th class="key">Examination</th>
+                            <th class="divider">:</th>
+                            <th class="value">${title}</th>
+                        </tr>
+                        <tr>
+                            <th class="key">Held In</th>
+                            <th class="divider">:</th>
+                            <th class="value">${year}</th>
+                        </tr>
+                        <tr>
+                            <th class="key">Seat No</th>
+                            <th class="divider">:</th>
+                            <th class="value">${seat_no}</th>
+                        </tr>
+                        <tr class="prn-absolute">
+                            <th class="key">Prn No</th>
+                            <th class="divider">:</th>
+                            <th class="value">${prn_no}</th>
+                        </tr>
+                    </thead>
+                </table>
+            `;
+        }
+    };
+
+    function getPages ({students, headers}) {
+        const pages = [];
+        students.forEach(student => {
+            // console.log(student, headers);
+            const $page = $(htmls.page());
+            $page.find(".main").html($(htmls.main(student)));
+            $page.find(".totals").html($(htmls.totals()));
+            $page.find(".backlog").html($(htmls.backlog()));
+            $page.find(".footer").html($(htmls.footer()));
+            $page.find(".header").html($(htmls.header(headers, student)));
+            pages.push($page);
+        });
+        return pages;
+    }
+
+    function init (data) {
+        const $book = $("<div></div>");
+        const $pages = getPages(data);
+        
+        // put pages in book
+        $pages.forEach(page => {
+            $book.append(page);
+        });
+    
+        // enable controls
+        if ($pages.length) {
+            enableControls();
+        }
+
+        return $book;
+    };
+
+    return { init };
+}
