@@ -21,7 +21,7 @@
     .non-printable { display: none; }
 }
 
-* {
+.page * {
     border-color: red !important;
 }
 
@@ -60,7 +60,7 @@
 /* Header */
 .header {
     height: auto;
-    margin-top: 100px;
+    margin-top: 130px;
     margin-bottom: 15px;
 }
 .header-table tr {

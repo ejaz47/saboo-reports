@@ -393,7 +393,7 @@ function MarksheetGererator () {
             const getPaperType = function (type) {
                 return type === "IA/ESE" ? "TH" : (type === "P/O" ? "PR/OR" : "TW");
             };
-            const getMinMaxText = (min, max) => {
+            const getMinMaxText = (min, max, type) => {
                 return min ? `${min}/${max}` : "--";
             };
             const getSubjectText = (name, type) => {
@@ -473,7 +473,7 @@ function MarksheetGererator () {
                                 <td>${getMinMaxText(marksMin1, marksMax1)}</td>
                                 <td>${paper.marks1 || "--"}</td>
                                 <td>${getGrade(paper.grade1) || "--"}</td>
-                                <td>${getMinMaxText(marksMin2, marksMax2)}</td>
+                                <td>${getMinMaxText(marksMin2, marksMax2)} ${paper.type === "IA/ESE" ? "(IA)" : ""}</td>
                                 <td>${paper.marks2 || "--"}</td>
                                 <td>${getGrade(paper.grade2) || "--"}</td>
                                 <td>${marksTotal}</td>
@@ -488,7 +488,7 @@ function MarksheetGererator () {
                                 <td>${getMinMaxText(marksMin1, marksMax1)}</td>
                                 <td>${paper.marks1 || "--"}</td>
                                 <td>${getGrade(paper.grade1) || "--"}</td>
-                                <td>${getMinMaxText(marksMin2, marksMax2)}</td>
+                                <td>${getMinMaxText(marksMin2, marksMax2)} ${paper.type === "IA/ESE" ? "(IA)" : ""}</td>
                                 <td>${paper.marks2 || "--"}</td>
                                 <td>${getGrade(paper.grade2) || "--"}</td>
                                 <td>${marksTotal}</td>
