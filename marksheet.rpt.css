@@ -22,27 +22,30 @@
 }
 
 * {
-    border-color: #5757577a !important;
+    border-color: red !important;
 }
 
 .page {
     width: 21cm;
     height: 29.6cm;
-    zoom: 100%;
+    zoom: 75%;
+    border: none;
 }
 
 
 /* Main marks table */
+.main {
+    height: 100%;
+    margin-bottom: 5px;
+}
 .main-table {
     border: 1px solid;
-    height: auto;
+    height: 100%;
     font-size: 9px;
 }
-.main-table tr {
-    border: 1px solid;
-}
 .main-table tr th, .main-table tr td{
-    border: 1px solid;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
     width: 5%;
     padding: 4px;
 }
@@ -134,4 +137,14 @@
 .footer .box .row .value .line{
     border-bottom: 1px solid black;
     margin-left: 6px;
+}
+
+.backlog, .totals {
+    margin-bottom: 5px;
+}
+.backlog .main-table, .totals .main-table {
+    height: auto;
+}
+.backlog .main-table .divider {
+    width: 2%;
 }

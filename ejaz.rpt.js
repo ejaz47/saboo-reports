@@ -336,7 +336,6 @@ function GazzetGenerator() {
         const iaeseCount = courses.filter(item => item.type === "IA/ESE").length;
         const twprCount = courses.filter(item => item.type === "TW/PR/OR").length;
         const maxCount = iaeseCount > twprCount ? iaeseCount : twprCount;
-        // console.log(iaeseCount, twprCount, maxCount, courses);
         maxCourseCount = maxCount > 7 ? 7 : (maxCount < 6 ? 5 : maxCount);
     }
 
@@ -391,9 +390,8 @@ function MarksheetGererator () {
             `;
         },
         main: ({courses}) => {
-            // console.log(student);
             const getPaperType = function (type) {
-                return type === "IA/ESE" ? "TH" : (type === "P/O" ? "P/O" : "TW");
+                return type === "IA/ESE" ? "TH" : (type === "P/O" ? "PR/OR" : "TW");
             };
             const getMinMaxText = (min, max) => {
                 return min ? `${min}/${max}` : "--";
@@ -402,12 +400,15 @@ function MarksheetGererator () {
                 name = name.replace("(TW)", "").replace("(IA)", "").trim();
                 return `${name} ${type === "IA/ESE" ? "" : "(TW/PR/OR)"}`;
             };
+            const getGrade = (grade) => {
+                return grade === "F" ? grade : (grade && (grade !== "-" || grade !== "--") ? "E" : "--")
+            }
 
             let table = `<table class="main-table">
                         <thead>
                             <tr>
-                                <th rowspan="2">Paper Code</th>
-                                <th rowspan="2" class="paper-name">Paper Name</th>
+                                <th rowspan="2">Course Code</th>
+                                <th rowspan="2" class="paper-name">Course Name</th>
                                 <th rowspan="2">AM</th>
                                 <th colspan="3">UA</th>
                                 <th colspan="3">CA</th>
@@ -451,7 +452,6 @@ function MarksheetGererator () {
                         <td>${paper.gp}</td>
                         <td>${paper.cgp}</td>
                     `;
-                    console.log(paper.type, nextPaper)
                     if (paper.type === "TW" && nextPaper && nextPaper.type === "P/O") {
                         const twopRowspan = 2;
                         gradeColumns = `
@@ -472,14 +472,14 @@ function MarksheetGererator () {
                                 <td>${getPaperType(paper.type)}</td>
                                 <td>${getMinMaxText(marksMin1, marksMax1)}</td>
                                 <td>${paper.marks1 || "--"}</td>
-                                <td>${paper.grade1 || "--"}</td>
+                                <td>${getGrade(paper.grade1) || "--"}</td>
                                 <td>${getMinMaxText(marksMin2, marksMax2)}</td>
                                 <td>${paper.marks2 || "--"}</td>
-                                <td>${paper.grade2 || "--"}</td>
+                                <td>${getGrade(paper.grade2) || "--"}</td>
                                 <td>${marksTotal}</td>
                                 <td>${paper.marksTotal}</td>
                                 ${gradeColumns}
-                                <td>--</td>
+                                <td></td>
                             </tr>`;
                     } else {
                         table += `
@@ -487,30 +487,87 @@ function MarksheetGererator () {
                                 <td>${getPaperType(paper.type)}</td>
                                 <td>${getMinMaxText(marksMin1, marksMax1)}</td>
                                 <td>${paper.marks1 || "--"}</td>
-                                <td>${paper.grade1 || "--"}</td>
+                                <td>${getGrade(paper.grade1) || "--"}</td>
                                 <td>${getMinMaxText(marksMin2, marksMax2)}</td>
                                 <td>${paper.marks2 || "--"}</td>
-                                <td>${paper.grade2 || "--"}</td>
+                                <td>${getGrade(paper.grade2) || "--"}</td>
                                 <td>${marksTotal}</td>
                                 <td>${paper.marksTotal}</td>
                                 ${gradeColumns}
-                                <td>--</td>
+                                <td></td>
                             </tr>`;
                     }
                 });
-                // const {} = 
             });
 
             table += `</tbody></table>`;
             return table;
         },
-        totals: () => {
-            return ``;
-        },
-        backlog: () => {
+        totals: ({totals, backlog}) => {
+            // console.log(totals);
+            let grandTotal = "";
+            if (backlog && backlog.length && backlog[backlog.length-1]) {
+                grandTotal = backlog[backlog.length-1]["marks"];
+            }
+            const {totalC, totalCG, GPA, remark, CGPI} = totals;
             return `
-
+                <table class="main-table">
+                    <tr>
+                        <td> Credits: ${totalC}</td> 
+                        <td> EGP: ${totalCG}</td> 
+                        <td> SGPA: ${GPA}</td> 
+                        <td> Grand Total: ${grandTotal}</td> 
+                    </tr>
+                    <tr>
+                        <td colspan="2"> Remarks: ${remark}</td> 
+                        <td colspan="2"> CGPA: ${CGPI || "-"}</td> 
+                    </tr>
+                </table>
             `;
+        },
+        backlog: ({backlog}) => {
+            // console.log(backlog);
+            if (!backlog.length) {
+                return "";
+            }
+
+            const updateColumns = ($tr, rowData) => {
+                const {sem, sgpi, credit, cg, marks} = rowData;
+                $tr.append($(`
+                    <td class="sem-name">${sem.toUpperCase()}</td>
+                    <td>CRED: ${credit.toUpperCase()}</td>
+                    <td>EGP: ${cg.toUpperCase()}</td>
+                    <td>SGPA: ${sgpi.toUpperCase()}</td>
+                    <td>Total: ${marks.toUpperCase()}</td>
+                `));
+            };
+            const $table = $('<table class="main-table"></table>');
+            let index = 0;
+            for (let i=0; i < Math.ceil(backlog.length/2); i++) {
+                const $tr = $("<tr></tr>");
+                if (backlog[index]) {
+                    updateColumns($tr, backlog[index]);
+                    index++;
+                    if (backlog[index]) {
+                        $tr.append($(`<td class="divider"></td>`));
+                        updateColumns($tr, backlog[index]);
+                        index++;
+                    }
+                }
+                $table.append($tr);
+            }
+            // backlog.forEach(({sem, sgpi, credit, cg, marks}, index) => {
+            //     const $tr = $("<tr></tr>");
+            //     $tr.append($(`
+            //         <td>${sem.toUpperCase()}</td>
+            //         <td>CRED: ${credit.toUpperCase()}</td>
+            //         <td>EGP: ${cg.toUpperCase()}</td>
+            //         <td>SGPA: ${sgpi.toUpperCase()}</td>
+            //         <td>Total: ${marks.toUpperCase()}</td>
+            //     `));
+            //     $table.append($tr);
+            // });
+            return $table;
         },
         footer: () => {
             return `
@@ -550,7 +607,7 @@ function MarksheetGererator () {
                 <table class="header-table">
                     <thead>
                         <tr>
-                            <th class="title" colspan="3">Cirtificate Showing the Result Of the Candidate</th>
+                            <th class="title" colspan="3">Certificate Showing the Result Of the Candidate</th>
                         </tr>
                         <tr>
                             <th class="key">Name</th>
@@ -589,8 +646,8 @@ function MarksheetGererator () {
             // console.log(student, headers);
             const $page = $(htmls.page());
             $page.find(".main").html($(htmls.main(student)));
-            $page.find(".totals").html($(htmls.totals()));
-            $page.find(".backlog").html($(htmls.backlog()));
+            $page.find(".totals").html($(htmls.totals(student)));
+            $page.find(".backlog").html($(htmls.backlog(student)));
             $page.find(".footer").html($(htmls.footer()));
             $page.find(".header").html($(htmls.header(headers, student)));
             pages.push($page);

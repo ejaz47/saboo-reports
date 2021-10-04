@@ -193,19 +193,18 @@
             }
 
             function getFormattedBacklogs(item) {
-                const backlog = {
-                    sgpi: [],
-                    credit: [],
-                    cg: [],
-                    marks: []
-                };
+                console.log(item);
+                const backlog = [];
                 const pushBacklog = (semKey) => {
                     const values = item[semKey].split("|");
-                    const semName = `Sem ${semKey.replace("_data", "").substr(3)}:`;
-                    backlog.sgpi.push({ sem: semName, value: values[0] || "" });
-                    backlog.credit.push({ sem: semName, value: values[1] || "" });
-                    backlog.cg.push({ sem: semName, value: values[2] || "" });
-                    backlog.marks.push({ sem: semName, value: values[4] ? `${values[3]}/${values[4]}` : "" });
+                    const semName = `Sem ${semKey.replace("_data", "").substr(3)}`;
+                    backlog.push({ 
+                        sem: semName, 
+                        sgpi: values[0] || "", 
+                        credit: values[1] || "", 
+                        cg: values[2] || "", 
+                        marks: values[4] ? `${values[3]}/${values[4]}` : ""
+                    });
                 };
 
                 const currentSemData = `${item["SGPI"]}|${item["sum_creditearned"]}|${item["sum_creditmulgrade"]}|${item["sum_totalmarksobtain"] || ""}|${item["sum_totalmarks"] || ""}`;
@@ -281,7 +280,8 @@
                             GPA: item["GPA"],
                             totalC: item["sum_creditearned"],
                             totalCG: item["sum_creditmulgrade"],
-                            total: item["total"]
+                            total: item["total"],
+                            remark: item["remark"]
                         }
                     };
                 });
