@@ -404,33 +404,37 @@ function MarksheetGererator () {
                 return grade === "F" ? grade : (grade && (grade !== "-" || grade !== "--") ? "E" : "--")
             }
 
-            let table = `<table class="main-table">
-                        <thead>
-                            <tr>
-                                <th rowspan="2">Course Code</th>
-                                <th rowspan="2" class="paper-name">Course Name</th>
-                                <th rowspan="2">AM</th>
-                                <th colspan="3">UA</th>
-                                <th colspan="3">CA</th>
-                                <th colspan="2">Total</th>
-                                <th rowspan="2">Cr</th>
-                                <th rowspan="2">Gr</th>
-                                <th rowspan="2">GP</th>
-                                <th rowspan="2">EGP</th>
-                                <th rowspan="2">Rmk</th>
-                            </tr>
-                            <tr>
-                                <th>Min/Max</th>
-                                <th>Obt</th>
-                                <th>Exm</th>
-                                <th>Min/Max</th>
-                                <th>Obt</th>
-                                <th>Exm</th>
-                                <th>Max</th>
-                                <th>Obt</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
+            // create table
+            let table = `
+                <table class="main-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Course Code</th>
+                            <th rowspan="2" class="paper-name">Course Name</th>
+                            <th rowspan="2">AM</th>
+                            <th colspan="3">UA</th>
+                            <th colspan="3">CA</th>
+                            <th colspan="2">Total</th>
+                            <th rowspan="2">Cr</th>
+                            <th rowspan="2">Gr</th>
+                            <th rowspan="2">GP</th>
+                            <th rowspan="2">EGP</th>
+                            <th rowspan="2">Rmk</th>
+                        </tr>
+                        <tr>
+                            <th>Min/Max</th>
+                            <th>Obt</th>
+                            <th>Exm</th>
+                            <th>Min/Max</th>
+                            <th>Obt</th>
+                            <th>Exm</th>
+                            <th>Max</th>
+                            <th>Obt</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            // create table rows
             Object.keys(courses).forEach(key => {
                 const papers = courses[key];
                 const paperCount = papers.length;
@@ -444,6 +448,7 @@ function MarksheetGererator () {
                         marksTotal
                     } = paper.courseDetails;
 
+                    // add rowspan to grade columns conditionally
                     const nextPaper = papers[index + 1];
                     const lastPaper = papers[index - 1];
                     let gradeColumns = `
@@ -464,42 +469,34 @@ function MarksheetGererator () {
                         gradeColumns = "";
                     }
 
+                    let commonColumns = `
+                        <td>${getPaperType(paper.type)}</td>
+                        <td>${getMinMaxText(marksMin1, marksMax1)}</td>
+                        <td>${paper.marks1 || "--"}</td>
+                        <td>${getGrade(paper.grade1) || "--"}</td>
+                        <td>${getMinMaxText(marksMin2, marksMax2)}${paper.type === "IA/ESE" ? "(IA)" : ""}</td>
+                        <td>${paper.marks2 || "--"}</td>
+                        <td>${getGrade(paper.grade2) || "--"}</td>
+                        <td>${marksTotal}</td>
+                        <td>${paper.marksTotal}</td>
+                        ${gradeColumns}
+                        <td></td>
+                    `;
+
                     if (index === 0) {
                         table += `
                             <tr>
                                 <td rowspan="${paperCount}">${paper.code}</td>
                                 <td class="paper-name" rowspan="${paperCount}">${getSubjectText(paper.name, paper.type)}</td>
-                                <td>${getPaperType(paper.type)}</td>
-                                <td>${getMinMaxText(marksMin1, marksMax1)}</td>
-                                <td>${paper.marks1 || "--"}</td>
-                                <td>${getGrade(paper.grade1) || "--"}</td>
-                                <td>${getMinMaxText(marksMin2, marksMax2)} ${paper.type === "IA/ESE" ? "(IA)" : ""}</td>
-                                <td>${paper.marks2 || "--"}</td>
-                                <td>${getGrade(paper.grade2) || "--"}</td>
-                                <td>${marksTotal}</td>
-                                <td>${paper.marksTotal}</td>
-                                ${gradeColumns}
-                                <td></td>
+                                ${commonColumns}
                             </tr>`;
                     } else {
-                        table += `
-                            <tr>
-                                <td>${getPaperType(paper.type)}</td>
-                                <td>${getMinMaxText(marksMin1, marksMax1)}</td>
-                                <td>${paper.marks1 || "--"}</td>
-                                <td>${getGrade(paper.grade1) || "--"}</td>
-                                <td>${getMinMaxText(marksMin2, marksMax2)} ${paper.type === "IA/ESE" ? "(IA)" : ""}</td>
-                                <td>${paper.marks2 || "--"}</td>
-                                <td>${getGrade(paper.grade2) || "--"}</td>
-                                <td>${marksTotal}</td>
-                                <td>${paper.marksTotal}</td>
-                                ${gradeColumns}
-                                <td></td>
-                            </tr>`;
+                        table += `<tr>${commonColumns}</tr>`;
                     }
                 });
             });
 
+            // close table
             table += `</tbody></table>`;
             return table;
         },
@@ -526,7 +523,6 @@ function MarksheetGererator () {
             `;
         },
         backlog: ({backlog}) => {
-            // console.log(backlog);
             if (!backlog.length) {
                 return "";
             }
@@ -556,17 +552,6 @@ function MarksheetGererator () {
                 }
                 $table.append($tr);
             }
-            // backlog.forEach(({sem, sgpi, credit, cg, marks}, index) => {
-            //     const $tr = $("<tr></tr>");
-            //     $tr.append($(`
-            //         <td>${sem.toUpperCase()}</td>
-            //         <td>CRED: ${credit.toUpperCase()}</td>
-            //         <td>EGP: ${cg.toUpperCase()}</td>
-            //         <td>SGPA: ${sgpi.toUpperCase()}</td>
-            //         <td>Total: ${marks.toUpperCase()}</td>
-            //     `));
-            //     $table.append($tr);
-            // });
             return $table;
         },
         footer: () => {

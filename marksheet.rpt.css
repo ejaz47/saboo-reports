@@ -104,6 +104,7 @@
 .footer .abbreviations {
     border: 1px solid;
     padding: 5px;
+    font-size: 9px;
 }
 .footer .box {
     width: 200px;
@@ -115,7 +116,7 @@
 }
 .footer .box .row{
     display: flex;
-    padding: 4px 0px;
+    padding: 8px 0px;
 }
 .footer .box .row.incharge, .footer .box .row.principal{
     position: absolute;
