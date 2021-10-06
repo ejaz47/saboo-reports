@@ -240,25 +240,13 @@
 
             function loadGazzeteDocument() {
                 var data = {
-                    perPage: 1,
                     headers: {
-                        isHeader: true,
-                        title: "",
-                        year: "",
-                        courses: [],
-                        totals: {
-                            CGPI: "CGPI",
-                            SGPI: "SGPI",
-                            GPA: "GPA",
-                            totalC: "&#8721;C",
-                            totalCG: "&#8721;CG",
-                            total: "RSLT"
-                        }
+                        branch: docInfo.branch,
+                        semester: docInfo.semester,
+                        year: docInfo.year,
+                        title: ""
                     },
-                    students: [],
-                    footer: {
-                        courses: []
-                    }
+                    students: []
                 };
                 
                 // Format subjects list
@@ -287,16 +275,11 @@
                 });
 
                 data.students = formattedStudents;
-                data.headers.courses = formattedSubjects;
-                data.footer.courses = subjectsData.map(item => {
-                    return {code: item["sub_code"], name: item["sub_name"].replace("(IA)", "").replace("(TW)", "")};
-                });
                 
                 // header title
                 data.headers.title = `${docInfo.semester === "Sem III" || docInfo.semester === "Sem IV" ? "Second Year" : "Third Year"}`;
                 data.headers.title += ` ${docInfo.branch} - Semester ${docInfo.semester.substr(4)} (C-Scheme-R-2019)`;
                 data.headers.title = data.headers.title.toUpperCase();
-                data.headers.year = docInfo.year;
 
                 //document titlte name update
                 document.title = `${docInfo.branch}-${docInfo.semester}-${docInfo.year}`;

@@ -82,7 +82,6 @@
 .header-table th.title {
     text-align: center;
     padding-bottom: 15px;
-    text-decoration: underline;
 }
 .header-table tr.prn-absolute {
     position: absolute;
@@ -107,12 +106,10 @@
     font-size: 9px;
 }
 .footer .box {
-    width: 200px;
+    width: 235px;
     margin-top: 10px;
     font: 11px "Arial";
     font-weight: 900;
-    display: flex;
-    flex-direction: column;
 }
 .footer .box .row{
     display: flex;
@@ -132,12 +129,10 @@
     color: red;
     padding-right: 2px;
 }
-.footer .box .row .value{
-    flex: 1;
-}
-.footer .box .row .value .line{
-    border-bottom: 1px solid black;
-    margin-left: 6px;
+.footer table th.value {
+    width: 60%;
+    padding: 0;
+    padding-top: 15px;
 }
 
 .backlog, .totals {
@@ -148,4 +143,13 @@
 }
 .backlog .main-table .divider {
     width: 2%;
+}
+
+.bold {
+    font-size: 10px;
+    font-weight: 900;
+}
+.line {
+    border-bottom: 1px solid black;
+    margin-left: 6px;
 }

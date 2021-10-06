@@ -398,7 +398,7 @@ function MarksheetGererator () {
             };
             const getSubjectText = (name, type) => {
                 name = name.replace("(TW)", "").replace("(IA)", "").trim();
-                return `${name} ${type === "IA/ESE" ? "" : "(TW/PR/OR)"}`;
+                return `${name}`;
             };
             const getGrade = (grade) => {
                 return grade === "F" ? grade : (grade && (grade !== "-" || grade !== "--") ? "E" : "--")
@@ -409,12 +409,12 @@ function MarksheetGererator () {
                 <table class="main-table">
                     <thead>
                         <tr>
-                            <th rowspan="2">Course Code</th>
-                            <th rowspan="2" class="paper-name">Course Name</th>
+                            <th rowspan="2">COURSE CODE</th>
+                            <th rowspan="2" class="paper-name">COURSE NAME</th>
                             <th rowspan="2">AM</th>
                             <th colspan="3">UA</th>
                             <th colspan="3">CA</th>
-                            <th colspan="2">Total</th>
+                            <th colspan="2">TOTAL</th>
                             <th rowspan="2">Cr</th>
                             <th rowspan="2">Gr</th>
                             <th rowspan="2">GP</th>
@@ -480,7 +480,7 @@ function MarksheetGererator () {
                         <td>${marksTotal}</td>
                         <td>${paper.marksTotal}</td>
                         ${gradeColumns}
-                        <td></td>
+                        <td>${getGrade(paper.grade1) === "F" || getGrade(paper.grade2) === "F" ? "F" : ""}</td>
                     `;
 
                     if (index === 0) {
@@ -500,7 +500,7 @@ function MarksheetGererator () {
             table += `</tbody></table>`;
             return table;
         },
-        totals: ({totals, backlog}) => {
+        totals: ({totals, backlog}, {semester}) => {
             // console.log(totals);
             let grandTotal = "";
             if (backlog && backlog.length && backlog[backlog.length-1]) {
@@ -510,14 +510,15 @@ function MarksheetGererator () {
             return `
                 <table class="main-table">
                     <tr>
+                        <td> ${semester.toUpperCase()}</td> 
                         <td> Credits: ${totalC}</td> 
                         <td> EGP: ${totalCG}</td> 
                         <td> SGPA: ${GPA}</td> 
                         <td> Grand Total: ${grandTotal}</td> 
                     </tr>
                     <tr>
-                        <td colspan="2"> Remarks: ${remark}</td> 
-                        <td colspan="2"> CGPA: ${CGPI || "-"}</td> 
+                        <td colspan="3" class="bold">Remarks: ${remark}</td> 
+                        <td colspan="2" class="bold">CGPA: ${CGPI || "-"}</td> 
                     </tr>
                 </table>
             `;
@@ -558,26 +559,34 @@ function MarksheetGererator () {
             return `
                 <div class="abbreviations">
                     Abbreviations: Gr: Grade. SGPA: Semester Grade Point Average. CGPA: Cumulative Grade Point Average. EGP:
-                    Earned Grade Points. E: Exempted, C:Current Appearance, X: Past Performance. N: Not Exempted, F: Head Failure,
-                    AB: Absent, / - Female, # 0.299 – Sport Benefit, ~ - Dyslexia Benefit, - - Not Applicable_
+                    Earned Grade Points. E: Exempted, F: Head Failure, AB: Absent, / - Female, # 0.299 – Sport Benefit, ~ - Dyslexia Benefit, - - Not Applicable_
+                    TH: Theory, UA: University Assessment, CA: College Assessment, DA: Direct Admission
                 </div>
                 <div class="box">
-                    <div class="row">
-                        <div class="key">Prepared by</div>
-                        <div class="value">:<div class="line"></div></div>
-                    </div>
-                    <div class="row">
-                        <div class="key">Verified by</div>
-                        <div class="value">:<div class="line"></div></div>
-                    </div>
-                    <div class="row">
-                        <div class="key">Date</div>
-                        <div class="value">:<div class="line"></div></div>
-                    </div>
-                    <div class="row">
-                        <div class="key">Place</div>
-                        <div class="value">: MUMBAI<div class="line"></div></div>
-                    </div>
+                    <table class="header-table">
+                        <thead>
+                            <tr>
+                                <th class="key">Prepared by</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Verified by</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Date</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Place</th>
+                                <th class="divider">:</th>
+                                <th style=" font-weight: 600; padding: 0px; padding-left:6px;">MUMBAI</th>
+                            </tr>
+                        </thead>
+                    </table>
                     <div class="row incharge">
                         <div class="key">INCHARGE EXAMINATIONS</div>
                     </div>
@@ -631,7 +640,7 @@ function MarksheetGererator () {
             // console.log(student, headers);
             const $page = $(htmls.page());
             $page.find(".main").html($(htmls.main(student)));
-            $page.find(".totals").html($(htmls.totals(student)));
+            $page.find(".totals").html($(htmls.totals(student, headers)));
             $page.find(".backlog").html($(htmls.backlog(student)));
             $page.find(".footer").html($(htmls.footer()));
             $page.find(".header").html($(htmls.header(headers, student)));
