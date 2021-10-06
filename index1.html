@@ -1,0 +1,235 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="ejaz.rpt.css">
+        <script src="jquery.3.min.js"></script>
+        <script src="ejaz.rpt.js"></script>
+        <script src="sample.data.js"></script>
+    </head>
+    <body>
+        <div class="non-printable" style="min-height: 150px;"></div>
+        <div class="book"></div>
+        <script>
+            var studentsData = window.STUDENTS;
+            var subjectsData = window.SUBJECTS;
+            var docInfo = {
+                branch: window.BRANCH,
+                semester: window.SEMESTER,
+                year: window.YEAR
+            };
+
+            function validatedValue(val) {
+                return val && val !== "--" ? val : "";
+            }
+
+            function getFormattedCourses(item) {
+                const courses = {};
+                Object.keys(item).forEach(key => {
+                    // if key starts with 'sub\d'
+                    if (/^sub\d/.test(key) && key.includes("_")) {
+                        const subKey = key.split("_")[0];
+                        if (!courses[subKey]) {
+                            courses[subKey] = {};
+                        }
+                        courses[subKey][key.substr(subKey.length + 1)] = item[key];
+                    }
+                });
+
+                // convert courses object to array
+                const coursesArray = Object.keys(courses).sort((a, b) => parseInt(a) - parseInt(b)).map(ckey => {
+                    return courses[ckey];
+                });
+                // split coursesArray into types
+                const splittesCourses = [];
+                coursesArray.forEach(item => {
+                    if (item["creditassigned_IAESE"] && item["creditassigned_IAESE"] !== "--") {
+                        splittesCourses.push({
+                            type: "IA/ESE",
+                            marks1: validatedValue(item["marks_ESE"]),
+                            marks2: validatedValue(item["marks_IA"]),
+                            grade1: validatedValue(item["grade_ESE"]),
+                            grade2: validatedValue(item["grade_IA"]),
+                            marksTotal: item["IAESE_total"],
+                            c: item["IAESE_creditearned"],
+                            g: item["IAESE_grade"],
+                            gp: item["IAESE_gradepoint"],
+                            cgp: item["IAESE_creditmulgrade"]
+                        });
+                    }
+                    if (item["creditassigned_TWPR"] && item["creditassigned_TWPR"] !== "--") {
+                        splittesCourses.push({
+                            type: "TW/PR/OR",
+                            marks1: validatedValue(item["marks_TW"]),
+                            marks2: validatedValue(item["marks_PR"]),
+                            grade1: validatedValue(item["grade_TW"]),
+                            grade2: validatedValue(item["grade_PR"]),
+                            marksTotal: item["TWPR_total"],
+                            c: item["TWPR_creditearned"],
+                            g: item["TWPR_grade"],
+                            gp: item["TWPR_gradepoint"],
+                            cgp: item["TWPR_creditmulgrade"]
+                        });
+                    }
+                });
+                return splittesCourses;
+            }
+
+            function getFormattedHeaderCourses(courses) {
+                const formattedCourses = [];
+                courses.forEach(item => {
+                    if (item["IA_include"] === "Yes" || item["ESE_include"] === "Yes") {
+                        formattedCourses.push({
+                            code: item["sub_code"],
+                            name: item["sub_name"],
+                            type: "IA/ESE",
+                            marksMin1: validatedValue(item["ESE_min"]),
+                            marksMax1: validatedValue(item["ESE_max"]),
+                            marksMin2: validatedValue(item["IA_min"]),
+                            marksMax2: validatedValue(item["IA_max"]),
+                            marksTotal: parseFloat(validatedValue(item["IA_max"]) || 0) + parseFloat(validatedValue(item["ESE_max"]) || 0),
+                            c: "C",
+                            g: "G",
+                            gp: "GP",
+                            cgp: "C*GP"
+                        });
+                    }
+                    if (item["TW_include"] === "Yes" || item["PROR_include"] === "Yes") {
+                        formattedCourses.push({
+                            code: item["sub_code"],
+                            name: item["sub_name"],
+                            type: "TW/PR/OR",
+                            marksMin1: validatedValue(item["TW_min"]),
+                            marksMax1: validatedValue(item["TW_max"]),
+                            marksMin2: validatedValue(item["PROR_min"]),
+                            marksMax2: validatedValue(item["PROR_max"]),
+                            marksTotal: parseFloat(validatedValue(item["TW_max"]) || 0) + parseFloat(validatedValue(item["PROR_max"]) || 0),
+                            c: "C",
+                            g: "G",
+                            gp: "GP",
+                            cgp: "C*GP"
+                        });
+                    }
+                });
+                return formattedCourses;
+            }
+
+            function getFormattedBacklogs(item) {
+                const backlog = {
+                    sgpi: [],
+                    credit: [],
+                    cg: [],
+                    marks: []
+                };
+                const pushBacklog = (semKey) => {
+                    const values = item[semKey].split("|");
+                    const semName = `Sem ${semKey.replace("_data", "").substr(3)}:`;
+                    backlog.sgpi.push({ sem: semName, value: values[0] || "" });
+                    backlog.credit.push({ sem: semName, value: values[1] || "" });
+                    backlog.cg.push({ sem: semName, value: values[2] || "" });
+                    backlog.marks.push({ sem: semName, value: values[4] ? `${values[3]}/${values[4]}` : "" });
+                };
+
+                const currentSemData = `${item["SGPI"]}|${item["sum_creditearned"]}|${item["sum_creditmulgrade"]}|${item["sum_totalmarksobtain"] || ""}|${item["sum_totalmarks"] || ""}`;
+
+                pushBacklog("semI_data");
+                pushBacklog("semII_data");
+                if (item["semester"].toUpperCase() === "SEM III") {
+                    item["semIII_data"] = currentSemData;
+                    pushBacklog("semIII_data");
+
+                } else if (item["semester"].toUpperCase() === "SEM IV") {
+                    pushBacklog("semIII_data");
+                    item["semIV_data"] = currentSemData;
+                    pushBacklog("semIV_data");
+
+                } else if (item["semester"].toUpperCase() === "SEM V") {
+                    pushBacklog("semIII_data");
+                    pushBacklog("semIV_data");
+                    item["semV_data"] = currentSemData;
+                    pushBacklog("semV_data");
+
+                } else if (item["semester"].toUpperCase() === "SEM VI") {
+                    pushBacklog("semIII_data");
+                    pushBacklog("semIV_data");
+                    pushBacklog("semV_data");
+                    item["semVI_data"] = currentSemData;
+                    pushBacklog("semVI_data");
+                }
+
+
+                return backlog;
+            }
+
+            function loadGazzeteDocument() {
+                var data = {
+                    perPage: 4,
+                    headers: {
+                        isHeader: true,
+                        title: "",
+                        courses: [],
+                        totals: {
+                            CGPI: "CGPI",
+                            SGPI: "SGPI",
+                            GPA: "GPA",
+                            totalC: "&#8721;C",
+                            totalCG: "&#8721;CG",
+                            total: "RSLT"
+                        }
+                    },
+                    students: [],
+                    footer: {
+                        courses: []
+                    }
+                };
+                
+                // Format students list
+                var formattedStudents = studentsData.map(item => {
+                    const courses = getFormattedCourses(item);
+                    return {
+                        examinationType: item["partwhole"] === "PART" ? "Part Examination" : "Whole Examination",
+                        prn_no: item["prn_no"],
+                        seat_no: item["seat_no"],
+                        name: item["student_name"],
+                        courses,
+                        backlog: getFormattedBacklogs(item),
+                        totals: {
+                            CGPI: item["CGPI"],
+                            SGPI: item["SGPI"],
+                            GPA: item["GPA"],
+                            totalC: item["sum_creditearned"],
+                            totalCG: item["sum_creditmulgrade"],
+                            total: item["total"]
+                        }
+                    };
+                });
+
+                // Format subjects list
+                var formattedSubjects = getFormattedHeaderCourses(subjectsData);
+
+                data.students = formattedStudents;
+                data.headers.courses = formattedSubjects;
+                data.footer.courses = subjectsData.map(item => {
+                    return {code: item["sub_code"], name: item["sub_name"].replace("(IA)", "").replace("(TW)", "")};
+                });
+                
+                // header title
+                data.headers.title = `${docInfo.semester === "Sem III" || docInfo.semester === "Sem IV" ? "Second Year" : "Third Year"}`;
+                data.headers.title += ` ${docInfo.branch} - Semester ${docInfo.semester.substr(4)} (C-Scheme-R-2019)`;
+                data.headers.title += ` EXAMINATION HELD IN ${docInfo.year}`;
+                data.headers.title = data.headers.title.toUpperCase();
+
+                //document titlte name update
+                document.title = `${docInfo.branch}-${docInfo.semester}-${docInfo.year}`;
+                
+                const gazzetGenerator = new GazzetGenerator();
+                const $book = gazzetGenerator.init(data);
+                $(".book").html($book.html());
+            }
+            
+            $(document).ready(() => {
+                if (studentsData.length) {
+                    loadGazzeteDocument();
+                }
+            });
+        </script>
+    </body>
+</html>
