@@ -559,7 +559,7 @@ function MarksheetGererator () {
             return `
                 <div class="abbreviations">
                     Abbreviations: Gr: Grade. SGPA: Semester Grade Point Average. CGPA: Cumulative Grade Point Average. EGP:
-                    Earned Grade Points. E: Exempted, F: Head Failure, AB:Absent, /: Female, #0.299: Sport Benefit, ~: Dyslexia Benefit, -: Not Applicable,
+                    Earned Grade Points. E: Exempted, F: Head Failure, AB:Absent, /: Female, #0.299: Sports Benefit, ~: Dyslexia Benefit, -: Not Applicable,
                     TH: Theory, UA: University Assessment, CA: College Assessment, DA: Direct Admission
                 </div>
                 <div class="box">
