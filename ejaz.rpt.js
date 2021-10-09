@@ -100,7 +100,7 @@ function GazzetGenerator() {
                         <table style="text-align: left">
                             <tr>
                                 <td width="50px">PRN No: </td>
-                                <td width="70px">${student.prn_no}</td>
+                                <td width="70px" style="padding-right: 20px;">${student.prn_no}</td>
                                 <td width="50px">Seat No: </td>
                                 <td width="70px">${student.seat_no}</td>
                                 <td width="40px">Name:</td>
