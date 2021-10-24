@@ -61,13 +61,13 @@ function GazzetGenerator() {
                 </div>
             `;
         },
-        courseCol: (data, classes, header=false) => {
+        courseCol: (data, classes, header=false, electiveCode) => {
             return `
                 <div class="course-col ${classes}">
                     <table>
                         ${header ? 
                             `<tr>
-                                <td colspan="7">${data.code}</td>
+                                <td colspan="7">${electiveCode || data.code}</td>
                             </tr>
                             <tr>
                                 <td width="20%">${data.marksMax1 ? data.marksMax1 + "/" + data.marksMin1 : ""}</td>
@@ -153,10 +153,16 @@ function GazzetGenerator() {
                 <P style="font-size: 16px; margin-top: 4px; font-weight: 600;">${title}</P>
             `;
         },
-        pageFooter: (courses) => {
+        pageFooter: (courses, electiveName) => {
             let coursesHtml = "";
             courses.forEach(item => {
-                coursesHtml += `<div><strong>${item.code}:</strong> ${item.name}</div>`;
+                let {code, name} = item;
+                if (item.name === "Elective-I" || item.name === "Elective-II") {
+                    const electiveCourse = electiveName.split("|");
+                    code = electiveCourse[0];
+                    name = electiveCourse[1];
+                }
+                coursesHtml += `<div><strong>${code}:</strong> ${name}</div>`;
             });
             return `
                 <div class="footer-top">
@@ -219,11 +225,15 @@ function GazzetGenerator() {
     let totalPages = 0;
     let maxCourseCount = 0;
 
-    function getCourseRows (header, classes="") {
+    function getCourseRows (header, classes="", electiveSubjectName) {
         let $mainSubHeader = $("<div></div>");
         const iaRows = [];
         const twRows = [];
         header.courses.forEach((course) => {
+            let electiveCourseCode = null;
+            if (course.name === "Elective-I" || course.name === "Elective-II") {
+                electiveCourseCode = electiveSubjectName.split("|")[0];
+            }
             if (course.type === "IA/ESE") {
                 let currentRowIndex = iaRows.length - 1;
                 // create first row
@@ -231,7 +241,7 @@ function GazzetGenerator() {
                     iaRows.push({cols: []});
                     currentRowIndex = iaRows.length - 1;
                 }
-                iaRows[currentRowIndex].cols.push($(htmls.courseCol(course, classes, header.isHeader)));
+                iaRows[currentRowIndex].cols.push($(htmls.courseCol(course, classes, header.isHeader, electiveCourseCode)));
             } else if (course.type === "TW/PR/OR") {
                 let currentRowIndex = twRows.length - 1;
                 // create first row
@@ -239,7 +249,7 @@ function GazzetGenerator() {
                     twRows.push({cols: []});
                     currentRowIndex = twRows.length - 1;
                 }
-                twRows[currentRowIndex].cols.push($(htmls.courseCol(course, classes, header.isHeader)));
+                twRows[currentRowIndex].cols.push($(htmls.courseCol(course, classes, header.isHeader, electiveCourseCode)));
             }
         });
         
@@ -332,6 +342,14 @@ function GazzetGenerator() {
         }, {});
     }
 
+    function getTotalPagesCount (groupArrays, perPage) {
+        let total = 0;
+        groupArrays.forEach(grp => {
+            total += Math.ceil(grp.length / perPage);
+        });
+        return total;
+    }
+
     function setMaxCoursesCount (courses) {
         const iaeseCount = courses.filter(item => item.type === "IA/ESE").length;
         const twprCount = courses.filter(item => item.type === "TW/PR/OR").length;
@@ -339,23 +357,59 @@ function GazzetGenerator() {
         maxCourseCount = maxCount > 7 ? 7 : (maxCount < 6 ? 5 : maxCount);
     }
 
+    function isElectiveName (name) {
+        const nameArr = name.split("|");
+        if (nameArr.length > 1) {
+            return true;
+        }
+        return false;
+    }
+
+    function setElectiveKey (data) {
+        for (let i=0; i<data.students.length; i++) {
+            const student = data.students[i];
+            student.elective = "";
+            student.courses.forEach(item => {
+                if (isElectiveName(item.name)) {
+                    student.elective = item.name;
+                }
+            });
+        }
+        return data;
+    }
+
     function init (data) {
+        data = setElectiveKey(data);
         setMaxCoursesCount(data.headers.courses);
-        totalPages = Math.ceil(data.students.length / data.perPage);
         const $book = $("<div></div>");
-        const $headerRows = getCourseRows(data.headers);
         const $headerRowsRight = htmls.courseRowsTotalCol(data.headers.totals);
         const $pageHeader = htmls.pageHeader(data.headers.title);
-        const $pageFooter = htmls.pageFooter(data.footer.courses);
         
         let $pages = [];
     
+        // Grouping
+        const groupedStudents = [];
         // group by examinationType
-        const exams = groupBy(data.students, "examinationType");
-        Object.keys(exams).sort((a, b) => b - a).forEach(examKey => {
-            const newPages = getPages(exams[examKey], data.perPage, $headerRows, $headerRowsRight, $pageHeader, $pageFooter);
-            $pages = $pages.concat(newPages);
+        const examination = groupBy(data.students, "examinationType");
+        Object.keys(examination).sort((a, b) => b.localeCompare(a)).forEach(examKey => {
+            // group by elective
+            const elective = groupBy(examination[examKey], "elective");
+            Object.keys(elective).forEach(electKey => {
+                groupedStudents.push(elective[electKey]);
+            });
         });
+        
+        // get total number of pages
+        totalPages = getTotalPagesCount(groupedStudents, data.perPage);
+
+        // process each group of students in new page
+        groupedStudents.forEach(grp => {
+            const electiveSubjectName = grp[0].elective;
+            const $headerRows = getCourseRows(data.headers, "", electiveSubjectName);
+            const $pageFooter = htmls.pageFooter(data.footer.courses, electiveSubjectName);
+            const newPages = getPages(grp, data.perPage, $headerRows, $headerRowsRight, $pageHeader, $pageFooter);
+            $pages = $pages.concat(newPages);
+        })
         
         // put pages in book
         $pages.forEach(page => {
@@ -389,7 +443,7 @@ function MarksheetGererator () {
                 </div>
             `;
         },
-        main: ({courses}) => {
+        main: ({courses, elective}) => {
             const getPaperType = function (type) {
                 return type === "IA/ESE" ? "TH" : (type === "P/O" ? "PR/OR" : "TW");
             };
@@ -440,6 +494,14 @@ function MarksheetGererator () {
                 const paperCount = papers.length;
                 papers.forEach((paper, index) => {
 
+                    let paperCode = paper.code;
+                    let paperName = paper.name;
+                    // if (paper.name === "Elective-I" || paper.name === "Elective-II") {
+                    //     const electiveSubject = elective.split("|");
+                    //     paperCode = electiveSubject[0];
+                    //     paperName = electiveSubject[1];
+                    // }
+
                     const {
                         marksMin1,
                         marksMin2,
@@ -486,8 +548,8 @@ function MarksheetGererator () {
                     if (index === 0) {
                         table += `
                             <tr>
-                                <td rowspan="${paperCount}">${paper.code}</td>
-                                <td class="paper-name" rowspan="${paperCount}">${getSubjectText(paper.name, paper.type)}</td>
+                                <td rowspan="${paperCount}">${paperCode}</td>
+                                <td class="paper-name" rowspan="${paperCount}">${getSubjectText(paperName, paper.type)}</td>
                                 ${commonColumns}
                             </tr>`;
                     } else {

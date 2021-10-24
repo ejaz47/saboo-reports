@@ -54,6 +54,7 @@
 }
 .main-table tr td.paper-name {
     text-align: left;
+    text-transform: uppercase;
 }
 
 

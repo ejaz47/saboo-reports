@@ -54,6 +54,7 @@
                 coursesArray.forEach(item => {
                     if (item["creditassigned_IAESE"] && item["creditassigned_IAESE"] !== "--") {
                         splittesCourses.push({
+                            name: item["name"],
                             type: "IA/ESE",
                             marks1: validatedValue(item["marks_ESE"]),
                             marks2: validatedValue(item["marks_IA"]),
@@ -68,6 +69,7 @@
                     }
                     if (item["creditassigned_TWPR"] && item["creditassigned_TWPR"] !== "--") {
                         splittesCourses.push({
+                            name: item["name"],
                             type: "TW/PR/OR",
                             marks1: validatedValue(item["marks_TW"]),
                             marks2: validatedValue(item["marks_PR"]),
@@ -85,8 +87,14 @@
                 // Assign subject info like name,code to each splitted course
                 const splittesCoursesWithSubject = splittesCourses.map((item, index) => {
                     item.courseDetails = subjects[index];
-                    item.code = item.courseDetails.code;
-                    item.name = item.courseDetails.name;
+                    if (item.courseDetails.name === "Elective-I" || item.courseDetails.name === "Elective-II") {
+                        const electiveSubject = item.name.split("|");
+                        item.code = electiveSubject[0] || item.courseDetails.code;
+                        item.name = electiveSubject[1] || item.courseDetails.name;
+                    } else {
+                        item.code = item.courseDetails.code;
+                        item.name = item.courseDetails.name;
+                    }
                     return item;
                 });
 
@@ -193,7 +201,6 @@
             }
 
             function getFormattedBacklogs(item) {
-                console.log(item);
                 const backlog = [];
                 const pushBacklog = (semKey) => {
                     const values = item[semKey].split("|");

@@ -43,6 +43,7 @@
                 coursesArray.forEach(item => {
                     if (item["creditassigned_IAESE"] && item["creditassigned_IAESE"] !== "--") {
                         splittesCourses.push({
+                            name: item["name"],
                             type: "IA/ESE",
                             marks1: validatedValue(item["marks_ESE"]),
                             marks2: validatedValue(item["marks_IA"]),
@@ -57,6 +58,7 @@
                     }
                     if (item["creditassigned_TWPR"] && item["creditassigned_TWPR"] !== "--") {
                         splittesCourses.push({
+                            name: item["name"],
                             type: "TW/PR/OR",
                             marks1: validatedValue(item["marks_TW"]),
                             marks2: validatedValue(item["marks_PR"]),
