@@ -874,6 +874,10 @@ function ListGererator () {
     };
 
     function getBook ({students, headers}, $book) {
+        students = students.map(item => {
+            item.partwhole = item.partwhole.toUpperCase();
+            return item;
+        });
         const groupedStudents = [];
         const examType = groupBy(students, "partwhole");
         Object.keys(examType).sort((a, b) => b.localeCompare(a)).forEach(examKey => {
