@@ -45,7 +45,11 @@
                 });
 
                 // convert courses object into an array
-                const coursesArray = Object.keys(courses).sort((a, b) => parseInt(a) - parseInt(b)).map(ckey => {
+                const coursesArray = Object.keys(courses).sort((a, b) => {
+                    a = +a.replace("sub", "");
+                    b = +b.replace("sub", "");
+                    return parseInt(a) - parseInt(b)
+                }).map(ckey => {
                     return courses[ckey];
                 });
 

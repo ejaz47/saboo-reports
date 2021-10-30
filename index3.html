@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="ejaz.rpt.css">
+        <link rel="stylesheet" href="marksheet.rpt.css">
+        <link rel="stylesheet" href="list.rpt.css">
+        <script src="jquery.3.min.js"></script>
+        <script src="ejaz.rpt.js"></script>
+        <script src="sample.list.js"></script>
+    </head>
+    <body>
+        <div class="non-printable" style="min-height: 150px;"></div>
+        <div class="book"></div>
+        <script>
+            const studentsData = window.STUDENTS;
+            const branch = window.BRANCH;
+            const year = window.YEAR;
+            const semester = window.SEMESTER;
+            const subjectName = window.SUBJECTNAME;
+            const fullHead = window.FULLHEAD;
+
+            function loadListDocument() {
+                var data = {
+                    headers: {
+                        branch,
+                        semester,
+                        year,
+                        subjectName,
+                        fullHead
+                    },
+                    students: studentsData
+                };
+
+                //document titlte name update
+                document.title = `Subject-wise-List-${branch}-${semester}-${year}`;
+                
+                const listGenerator = new ListGererator();
+                const $book = listGenerator.init(data);
+                $(".book").html($book.html());
+            }
+
+            $(document).ready(() => {
+                if (studentsData.length) {
+                    loadListDocument();
+                }
+            });
+        </script>
+    </body>
+</html>

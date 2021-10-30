@@ -45,6 +45,18 @@ function enableControls () {
     });
 }
 
+function groupBy (objectArray, property) {
+    return objectArray.reduce((acc, obj) => {
+       const key = obj[property];
+       if (!acc[key]) {
+          acc[key] = [];
+       }
+       // Add object to list for given key's value
+       acc[key].push(obj);
+       return acc;
+    }, {});
+}
+
 function GazzetGenerator() {
     const htmls = {
         courseRow: (data, classes) => {
@@ -328,18 +340,6 @@ function GazzetGenerator() {
             pages[currentPage].find(".main .content").append($block);
         });
         return pages;
-    }
-    
-    function groupBy (objectArray, property) {
-        return objectArray.reduce((acc, obj) => {
-           const key = obj[property];
-           if (!acc[key]) {
-              acc[key] = [];
-           }
-           // Add object to list for given key's value
-           acc[key].push(obj);
-           return acc;
-        }, {});
     }
 
     function getTotalPagesCount (groupArrays, perPage) {
@@ -726,6 +726,186 @@ function MarksheetGererator () {
         }
 
         return $book;
+    };
+
+    return { init };
+}
+
+function ListGererator () {
+
+    const htmls = {
+        page: (pageCount, totalPages, examination) => {
+            return `
+                <div class="page">
+                    <div class="subpage">
+                        <div class="header"></div>
+                        <p style="font-size: 14;font-weight: 600;text-align: center;background: #ddd;padding: 2px;}">
+                            ${examination} EXAMINATION
+                        </p>
+                        <div class="main"></div>
+                        <div class="footer"></div>
+                        <p style="text-align: right">Page ${pageCount} of ${totalPages}</p>
+                    </div>
+                </div>
+            `;
+        },
+        main: (students) => {
+            // create table
+            let table = `
+                <table class="main-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="seat_no">Seat No.</th>
+                            <th rowspan="2" class="student_name">Student Name</th>
+                            <th colspan="2">Marks Obtained</th>
+                        </tr>
+                        <tr>
+                            <th>In Figures</th>
+                            <th>In Words</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            // create table rows
+            students.forEach(student => {
+                table += `
+                    <tr>
+                        <td class="seat_no">${student.seat_no}</td>
+                        <td class="student_name">${student.student_name}</td>
+                        <td class="mark_figures"></td>
+                        <td class="mark_words"></td>
+                    </tr>
+                `;
+            });
+
+            // close table
+            table += `</tbody></table>`;
+            return table;
+        },
+        footer: () => {
+            return `
+                <div class="box">
+                    <table class="header-table footer-table">
+                        <thead>
+                            <tr>
+                                <th class="key">Internal Examiner</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Signature</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">External Examiner</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Signature</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Principal</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <table class="header-table footer-table right">
+                        <thead>
+                            <tr>
+                                <th class="key">College</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">College</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                            <tr>
+                                <th class="key">Date</th>
+                                <th class="divider">:</th>
+                                <th class="value"><div class="line"></div></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            `;
+        },
+        header: ({fullHead, branch, semester, year, subjectName}) => {
+            return `
+                <p>Anjuman-I-Islam's</p>
+                <p style="font-size: 18px; font-weight: 600;">M.H. SABOO SIDDIK COLLEGE OF ENGINEERING</p>
+                <P style="font-weight: 600;">8, Saboo Siddik Polytechnic Road, Byculla, Mumbai-400008</P>
+                <P style="font-size: 12px; margin-top: 15px; font-weight: 800; text-decoration: underline;">Head: ${fullHead}</P>
+                <div class="head-box">
+                    <div>
+                        <span class="bolder">Branch:</span>
+                        <span>${branch}</span>
+                    </div>
+                    <div>
+                        <span class="bolder">Semester:</span>
+                        <span>${semester}</span>
+                    </div>
+                    <div>
+                        <span class="bolder">Year:</span>
+                        <span>${year}</span>
+                    </div>
+                </div>
+                <div class="head-box">
+                    <div style="display: flex; width: 50%;">
+                        <span class="bolder">Subject:</span>
+                        <span style="flex: 1; margin-left: 9px; text-align: left;">
+                            ${subjectName}
+                            <div class="line" style="margin: 0;"></div>
+                        </span>
+                    </div>
+                    <div style="display:flex; width: 200px;">
+                        <div class="bolder">Maximum Marks:</div>
+                        <div class="line" style="flex: 1"></div>
+                    </div>
+                </div>
+            `;
+        }
+    };
+
+    function getBook ({students, headers}, $book) {
+        const groupedStudents = [];
+        const examType = groupBy(students, "partwhole");
+        Object.keys(examType).sort((a, b) => b.localeCompare(a)).forEach(examKey => {
+            groupedStudents.push(examType[examKey]);
+        });
+        console.log(groupedStudents);
+        const pages = [];
+        const size = 18;
+        groupedStudents.forEach(studentGroup => {
+            for (var i=0; i<studentGroup.length; i+=size) {
+                pages.push(studentGroup.slice(i,i+size));
+            }
+        })
+
+        const totalPages = pages.length;
+        let pageCount = 1;
+        pages.forEach(studentsSet => {
+            const $page = $(htmls.page(pageCount++, totalPages, studentsSet[0].partwhole));
+            $page.find(".main").html($(htmls.main(studentsSet)));
+            $page.find(".footer").html($(htmls.footer()));
+            $page.find(".header").html($(htmls.header(headers)));
+            $book.append($page);
+        });
+
+        return $book;
+    }
+
+    function init (data) {
+        const $book = $("<div></div>");
+        // enable controls
+        enableControls();
+        return getBook(data, $book);
     };
 
     return { init };

@@ -1,0 +1,60 @@
+.page * {
+    border-color: black !important;
+}
+.header {
+    margin: 0px;
+    margin-bottom: 10px;
+}
+.bolder {
+    font-weight: 800;
+}
+.head-box {
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    margin: 15px auto;
+}
+
+.main-table {
+    font-size: 10px;
+    height: auto;
+}
+.main-table th {
+    font-size: 11px;
+    font-weight: 800;
+}
+.main-table tr th, .main-table tr td {
+    padding: 10px 4px;
+}
+.main-table td.seat_no, .main-table th.seat_no {
+    width: 10%;
+}
+.main-table td.student_name, .main-table th.student_name {
+    width: 60%;
+}
+.main-table td.student_name {
+    text-align: left;
+}
+.main-table td.mark_figures {
+    width: 10%;
+}
+.main-table td.mark_words {
+    width: 20%;
+}
+
+.footer .box {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.footer .box .footer-table {
+    width: 50%;
+}
+.footer .footer-table th.key {
+    color: black;
+    padding-right: 4px;
+    white-space: nowrap;
+}
+.footer .footer-table.right th.key {
+    text-align: right;
+}
