@@ -846,7 +846,12 @@ function ListGererator () {
         },
         header: ({fullHead, branch, semester, year, subjectName, pattern}, isSeatingArrangement) => {
             const title = isSeatingArrangement ? "Seating Arrangement for ESE" : `Head: ${fullHead}`;
-
+            const maxMarkHtml = isSeatingArrangement ? "" : `
+                <div style="display:flex; width: 200px;">
+                    <div class="bolder">Maximum Marks:</div>
+                    <div class="line" style="flex: 1"></div>
+                </div>
+            `;
             return `
                 <p>Anjuman-I-Islam's</p>
                 <p style="font-size: 18px; font-weight: 600;">M.H. SABOO SIDDIK COLLEGE OF ENGINEERING</p>
@@ -874,10 +879,7 @@ function ListGererator () {
                             <div class="line" style="margin: 0;"></div>
                         </span>
                     </div>
-                    <div style="display:flex; width: 200px;">
-                        <div class="bolder">Maximum Marks:</div>
-                        <div class="line" style="flex: 1"></div>
-                    </div>
+                    ${maxMarkHtml}
                 </div>
             `;
         }
