@@ -857,10 +857,10 @@ function ListGererator () {
                     </div>
                 </div>
                 <div class="head-box">
-                    <div style="display: flex; width: 50%;">
+                    <div style="display: flex; width: 70%;">
                         <span class="bolder">Subject:</span>
                         <span style="flex: 1; margin-left: 9px; text-align: left;">
-                            ${subjectName}
+                            ${subjectName.replace("(TW)", "").replace("(IA)", "")}
                             <div class="line" style="margin: 0;"></div>
                         </span>
                     </div>
