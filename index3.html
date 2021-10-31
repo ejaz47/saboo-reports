@@ -19,9 +19,11 @@
             const subjectName = window.SUBJECTNAME;
             const head = window.HEAD;
             const fullHead = window.FULLHEAD;
-
+            const pattern = window.PATTERN;
+            const isSeatingArrangement = window.ISSEATINGARRANGEMENT;
             function loadListDocument() {
                 var data = {
+                    isSeatingArrangement,
                     headers: {
                         branch,
                         semester,
@@ -29,7 +31,8 @@
                         subNotation,
                         subjectName,
                         head,
-                        fullHead
+                        fullHead,
+                        pattern
                     },
                     students: studentsData
                 };

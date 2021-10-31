@@ -58,3 +58,16 @@
 .footer .footer-table.right th.key {
     text-align: right;
 }
+
+.seats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+}
+
+.seats span {
+    width: 79px;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+}

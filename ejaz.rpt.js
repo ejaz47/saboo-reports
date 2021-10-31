@@ -749,7 +749,15 @@ function ListGererator () {
                 </div>
             `;
         },
-        main: (students) => {
+        main: (students, isSeatingArrangement) => {
+            if (isSeatingArrangement) {
+                let html = `<div class="seats">`;
+                students.forEach(student => {
+                    html += `<span>${student.seat_no}</span>`;
+                });
+                html += "</div>";
+                return html;
+            }
             // create table
             let table = `
                 <table class="main-table">
@@ -836,12 +844,14 @@ function ListGererator () {
                 </div>
             `;
         },
-        header: ({fullHead, branch, semester, year, subjectName}) => {
+        header: ({fullHead, branch, semester, year, subjectName, pattern}, isSeatingArrangement) => {
+            const title = isSeatingArrangement ? "Seating Arrangement for ESE" : `Head: ${fullHead}`;
+
             return `
                 <p>Anjuman-I-Islam's</p>
                 <p style="font-size: 18px; font-weight: 600;">M.H. SABOO SIDDIK COLLEGE OF ENGINEERING</p>
                 <P style="font-weight: 600;">8, Saboo Siddik Polytechnic Road, Byculla, Mumbai-400008</P>
-                <P style="font-size: 12px; margin-top: 15px; font-weight: 800; text-decoration: underline;">Head: ${fullHead}</P>
+                <P style="font-size: 12px; margin-top: 15px; font-weight: 800; text-decoration: underline;">${title}</P>
                 <div class="head-box">
                     <div>
                         <span class="bolder">Branch:</span>
@@ -849,7 +859,7 @@ function ListGererator () {
                     </div>
                     <div>
                         <span class="bolder">Semester:</span>
-                        <span>${semester}</span>
+                        <span>${semester} (${pattern})</span>
                     </div>
                     <div>
                         <span class="bolder">Year:</span>
@@ -896,24 +906,28 @@ function ListGererator () {
         });
     };
 
-    function getBook ({students, headers}, $book) {
+    function getBook ({students, headers, isSeatingArrangement}, $book) {
+        console.log(students);
+
         students = getSubjectWisefilterStudents(students, headers).map(item => {
             item.partwhole = item.partwhole.toUpperCase();
             return item;
         });
+
         const groupedStudents = [];
         const examType = groupBy(students, "partwhole");
         Object.keys(examType).sort((a, b) => b.localeCompare(a)).forEach(examKey => {
             groupedStudents.push(examType[examKey]);
         });
         console.log(groupedStudents);
+
         const pages = [];
-        const size = 18;
+        const size = isSeatingArrangement ? 198 : 18;
         groupedStudents.forEach(studentGroup => {
             for (var i=0; i<studentGroup.length; i+=size) {
                 pages.push(studentGroup.slice(i,i+size));
             }
-        })
+        });
 
         const totalPages = pages.length;
         let pageCount = 1;
@@ -921,16 +935,20 @@ function ListGererator () {
         if (pages.length) {
             pages.forEach(studentsSet => {
                 const $page = $(htmls.page(pageCount++, totalPages, studentsSet[0].partwhole));
-                $page.find(".main").html($(htmls.main(studentsSet)));
-                $page.find(".footer").html($(htmls.footer()));
-                $page.find(".header").html($(htmls.header(headers)));
+                $page.find(".main").html($(htmls.main(studentsSet, isSeatingArrangement)));
+                $page.find(".header").html($(htmls.header(headers, isSeatingArrangement)));
+                if (!isSeatingArrangement) {
+                    $page.find(".footer").html($(htmls.footer()));
+                }
                 $book.append($page);
             });
         } else {
             const $page = $(htmls.page(pageCount, totalPages, "NO STUDENTS FOR "));
-            $page.find(".main").html($(htmls.main([])));
-            $page.find(".footer").html($(htmls.footer()));
-            $page.find(".header").html($(htmls.header(headers)));
+            $page.find(".main").html($(htmls.main([], isSeatingArrangement)));
+            $page.find(".header").html($(htmls.header(headers, isSeatingArrangement)));
+            if (!isSeatingArrangement) {
+                $page.find(".footer").html($(htmls.footer()));
+            }
             $book.html($page);
             // $book.html($(`<h1>No Students found!</h1>`));
         }
