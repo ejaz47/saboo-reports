@@ -873,8 +873,31 @@ function ListGererator () {
         }
     };
 
+    function isFailedIn (value) {
+        return !value || value == "" || value == "F" || value == "-";
+    };
+
+    function getSubjectWisefilterStudents (students, {subNotation, head}) {
+        if (!subNotation || subNotation === "ALL") {
+            return students;
+        }
+        return students.filter(item => {
+            if (head === "ALL") {
+                return isFailedIn(item[`${subNotation}_TWPR_grade`]) || isFailedIn(item[`${subNotation}_IAESE_grade`]);
+            } else if (head === "IA") {
+                return isFailedIn(item[`${subNotation}_grade_IA`]);
+            } else if (head === "ESE") {
+                return isFailedIn(item[`${subNotation}_grade_ESE`]);
+            } else if (head === "TW") {
+                return isFailedIn(item[`${subNotation}_grade_TW`]);
+            } else if (head === "PR") {
+                return isFailedIn(item[`${subNotation}_grade_PR`]);
+            }
+        });
+    };
+
     function getBook ({students, headers}, $book) {
-        students = students.map(item => {
+        students = getSubjectWisefilterStudents(students, headers).map(item => {
             item.partwhole = item.partwhole.toUpperCase();
             return item;
         });
@@ -894,13 +917,23 @@ function ListGererator () {
 
         const totalPages = pages.length;
         let pageCount = 1;
-        pages.forEach(studentsSet => {
-            const $page = $(htmls.page(pageCount++, totalPages, studentsSet[0].partwhole));
-            $page.find(".main").html($(htmls.main(studentsSet)));
+        $book.html("");
+        if (pages.length) {
+            pages.forEach(studentsSet => {
+                const $page = $(htmls.page(pageCount++, totalPages, studentsSet[0].partwhole));
+                $page.find(".main").html($(htmls.main(studentsSet)));
+                $page.find(".footer").html($(htmls.footer()));
+                $page.find(".header").html($(htmls.header(headers)));
+                $book.append($page);
+            });
+        } else {
+            const $page = $(htmls.page(pageCount, totalPages, "NO STUDENTS FOR "));
+            $page.find(".main").html($(htmls.main([])));
             $page.find(".footer").html($(htmls.footer()));
             $page.find(".header").html($(htmls.header(headers)));
-            $book.append($page);
-        });
+            $book.html($page);
+            // $book.html($(`<h1>No Students found!</h1>`));
+        }
 
         return $book;
     }
