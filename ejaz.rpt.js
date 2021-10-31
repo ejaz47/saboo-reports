@@ -878,11 +878,11 @@ function ListGererator () {
     };
 
     function getSubjectWisefilterStudents (students, {subNotation, head}) {
-        if (!subNotation || subNotation === "ALL") {
+        if (!subNotation || subNotation.toUpperCase() === "ALL") {
             return students;
         }
         return students.filter(item => {
-            if (head === "ALL") {
+            if (head.toUpperCase() === "ALL") {
                 return isFailedIn(item[`${subNotation}_TWPR_grade`]) || isFailedIn(item[`${subNotation}_IAESE_grade`]);
             } else if (head === "IA") {
                 return isFailedIn(item[`${subNotation}_grade_IA`]);
