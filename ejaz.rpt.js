@@ -924,7 +924,7 @@ function ListGererator () {
         console.log(groupedStudents);
 
         const pages = [];
-        const size = isSeatingArrangement ? 198 : 18;
+        const size = isSeatingArrangement ? 198 : 16;
         groupedStudents.forEach(studentGroup => {
             for (var i=0; i<studentGroup.length; i+=size) {
                 pages.push(studentGroup.slice(i,i+size));
