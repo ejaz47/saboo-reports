@@ -790,83 +790,69 @@ function ListGererator () {
         },
         footer: () => {
             return `
-                <div class="box">
-                    <table class="header-table footer-table">
-                        <thead>
-                            <tr>
-                                <th class="key">Internal Examiner</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                            <tr>
-                                <th class="key">Signature</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                            <tr>
-                                <th class="key">External Examiner</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                            <tr>
-                                <th class="key">Signature</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                            <tr>
-                                <th class="key">Principal</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <table class="header-table footer-table right">
-                        <thead>
-                            <tr>
-                                <th class="key">College</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                            <tr>
-                                <th class="key">College</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                            <tr>
-                                <th class="key">Date</th>
-                                <th class="divider">:</th>
-                                <th class="value"><div class="line"></div></th>
-                            </tr>
-                        </thead>
-                    </table>
+                <div class="head-box" style="width: 100%; justify-content: left;">
+                    <div style="display: flex; width: 80%;">
+                        <div class="bolder">1) Internal Examiner Name, Sign. & College</div>
+                        <div class="line" style="flex: 1"></div>
+                    </div>
+                </div>
+                <div class="head-box" style="width: 100%; justify-content: left;">
+                    <div style="display: flex; width: 80%;">
+                        <div class="bolder">2) External Examiner Name, Sign. & College</div>
+                        <div class="line" style="flex: 1"></div>
+                    </div>
+                </div>
+                <div class="head-box" style="width: 100%; justify-content: left;">
+                    <div style="display: flex; width: 350px;">
+                        <div class="bolder">Signature of the Principal</div>
+                        <div class="line" style="flex: 1"></div>
+                    </div>
+                    <div style="display:flex; width: 150px;">
+                        <div class="bolder">DATE</div>
+                        <div class="line" style="flex: 1"></div>
+                    </div>
                 </div>
             `;
         },
         header: ({fullHead, branch, semester, year, subjectName, pattern}, isSeatingArrangement) => {
             const title = isSeatingArrangement ? "Seating Arrangement for ESE" : `Head: ${fullHead}`;
-            const maxMarkHtml = isSeatingArrangement ? "" : `
+            const subjectCode = isSeatingArrangement ? "" : `
                 <div style="display:flex; width: 200px;">
-                    <div class="bolder">Maximum Marks:</div>
+                    <div class="bolder">Subject Code:</div>
                     <div class="line" style="flex: 1"></div>
                 </div>
             `;
+            const maxMarkHtml = isSeatingArrangement ? "" : `
+                <div style="display:flex; width: 200px;">
+                    <div class="bolder">Max. Marks:</div>
+                    <div class="line" style="flex: 1"></div>
+                </div>
+            `;
+            const minMarkHtml = isSeatingArrangement ? "" : `
+                <div style="display:flex; width: 200px;">
+                    <div class="bolder">Min. Marks:</div>
+                    <div class="line" style="flex: 1"></div>
+                </div>
+            `;
+            const sem = semester.replace("Sem", "").trim();
+            let semText = "SE-" + sem;
+            if (sem == "VI" || sem == "V") {
+                semText = "TE-" + sem;
+            }
             return `
                 <p>Anjuman-I-Islam's</p>
                 <p style="font-size: 18px; font-weight: 600;">M.H. SABOO SIDDIK COLLEGE OF ENGINEERING</p>
                 <P style="font-weight: 600;">8, Saboo Siddik Polytechnic Road, Byculla, Mumbai-400008</P>
-                <P style="font-size: 12px; margin-top: 15px; font-weight: 800; text-decoration: underline;">${title}</P>
+                <P style="font-size: 12px; margin-top: 15px; font-weight: 800;">Examination held "${year.replace("DEC", "DECEMBER -").replace("MAY", "MAY -")}"</P>
+                <P style="font-size: 12px; font-weight: 800;">${title}</P>
                 <div class="head-box">
+                    <div>
+                        <span class="bolder">Semester:</span>
+                        <span>${semText} (C-SCHEME)(R-19)</span>
+                    </div>
                     <div>
                         <span class="bolder">Branch:</span>
                         <span>${branch}</span>
-                    </div>
-                    <div>
-                        <span class="bolder">Semester:</span>
-                        <span>${semester} (${pattern})</span>
-                    </div>
-                    <div>
-                        <span class="bolder">Year:</span>
-                        <span>${year}</span>
                     </div>
                 </div>
                 <div class="head-box">
@@ -877,7 +863,20 @@ function ListGererator () {
                             <div class="line" style="margin: 0;"></div>
                         </span>
                     </div>
+                    ${subjectCode}
+                </div>
+                <div class="head-box">
+                    <div style="display: flex; width: 70%;">
+                        <span style="text-align: center; flex: 1">(full name)</span>
+                    </div>
                     ${maxMarkHtml}
+                </div>
+                <div class="head-box">
+                    <div style="display:flex; width: 200px;">
+                        <div class="bolder">Date:</div>
+                        <div class="line" style="flex: 1"></div>
+                    </div>
+                    ${minMarkHtml}
                 </div>
             `;
         }
