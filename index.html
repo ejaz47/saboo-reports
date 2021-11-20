@@ -22,6 +22,23 @@
                 return val && val !== "--" ? val : "";
             }
 
+            function getSubjectHead(notation) {
+                const res = {
+                    iaese: false,
+                    twpr: false
+                };
+                const found = subjectsData.find(item => item.sub_notation == notation);
+                if (found) {
+                    if (found["IA_include"] === "Yes" || found["ESE_include"] === "Yes") {
+                        res.iaese = true;
+                    }
+                    if (found["TW_include"] === "Yes" || found["PROR_include"] === "Yes") {
+                        res.twpr = true;
+                    }
+                }
+                return res;
+            }
+
             function getFormattedCourses(item, subjects) {
                 // we have student details in key value pairs of database
                 // e.g. {
@@ -55,8 +72,9 @@
 
                 // split coursesArray into types (Theory(IA/ESE) and Termwork/practical(TW/PR/OR))
                 const splittesCourses = [];
-                coursesArray.forEach(item => {
-                    if (item["creditassigned_IAESE"] && item["creditassigned_IAESE"] !== "--") {
+                coursesArray.forEach((item, index) => {
+                    const subjectHeads = getSubjectHead(`sub${index + 1}`);
+                    if (subjectHeads.iaese) {
                         splittesCourses.push({
                             name: item["name"],
                             type: "IA/ESE",
@@ -71,7 +89,7 @@
                             cgp: item["IAESE_creditmulgrade"]
                         });
                     }
-                    if (item["creditassigned_TWPR"] && item["creditassigned_TWPR"] !== "--") {
+                    if (subjectHeads.twpr) {
                         splittesCourses.push({
                             name: item["name"],
                             type: "TW/PR/OR",

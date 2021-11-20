@@ -563,7 +563,6 @@ function MarksheetGererator () {
             return table;
         },
         totals: ({totals, backlog}, {semester}) => {
-            // console.log(totals);
             let grandTotal = "";
             if (backlog && backlog.length && backlog[backlog.length-1]) {
                 grandTotal = backlog[backlog.length-1]["marks"];
@@ -699,7 +698,6 @@ function MarksheetGererator () {
     function getPages ({students, headers}) {
         const pages = [];
         students.forEach(student => {
-            // console.log(student, headers);
             const $page = $(htmls.page());
             $page.find(".main").html($(htmls.main(student)));
             $page.find(".totals").html($(htmls.totals(student, headers)));
@@ -909,7 +907,6 @@ function ListGererator () {
     };
 
     function getBook ({students, headers, isSeatingArrangement}, $book) {
-        console.log(students);
 
         students = getSubjectWisefilterStudents(students, headers).map(item => {
             item.partwhole = item.partwhole.toUpperCase();
@@ -921,7 +918,6 @@ function ListGererator () {
         Object.keys(examType).sort((a, b) => b.localeCompare(a)).forEach(examKey => {
             groupedStudents.push(examType[examKey]);
         });
-        console.log(groupedStudents);
 
         const pages = [];
         const size = isSeatingArrangement ? 198 : 16;

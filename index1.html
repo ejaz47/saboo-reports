@@ -21,6 +21,23 @@
                 return val && val !== "--" ? val : "";
             }
 
+            function getSubjectHead(notation) {
+                const res = {
+                    iaese: false,
+                    twpr: false
+                };
+                const found = subjectsData.find(item => item.sub_notation == notation);
+                if (found) {
+                    if (found["IA_include"] === "Yes" || found["ESE_include"] === "Yes") {
+                        res.iaese = true;
+                    }
+                    if (found["TW_include"] === "Yes" || found["PROR_include"] === "Yes") {
+                        res.twpr = true;
+                    }
+                }
+                return res;
+            }
+
             function getFormattedCourses(item) {
                 const courses = {};
                 Object.keys(item).forEach(key => {
@@ -35,7 +52,6 @@
                 });
 
                 // convert courses object to array
-                console.log(courses);
                 const coursesArray = Object.keys(courses).sort((a, b) => {
                     a = +a.replace("sub", "");
                     b = +b.replace("sub", "");
@@ -43,11 +59,11 @@
                 }).map(ckey => {
                     return courses[ckey];
                 });
-                console.log(coursesArray);
                 // split coursesArray into types
                 const splittesCourses = [];
-                coursesArray.forEach(item => {
-                    if (item["creditassigned_IAESE"] && item["creditassigned_IAESE"] !== "--") {
+                coursesArray.forEach((item, index) => {
+                    const subjectHeads = getSubjectHead(`sub${index + 1}`);
+                    if (subjectHeads.iaese) {
                         splittesCourses.push({
                             name: item["name"],
                             type: "IA/ESE",
@@ -62,7 +78,7 @@
                             cgp: item["IAESE_creditmulgrade"]
                         });
                     }
-                    if (item["creditassigned_TWPR"] && item["creditassigned_TWPR"] !== "--") {
+                    if (subjectHeads.twpr) {
                         splittesCourses.push({
                             name: item["name"],
                             type: "TW/PR/OR",
