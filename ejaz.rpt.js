@@ -802,14 +802,17 @@ function ListGererator () {
                         <div class="line" style="flex: 1"></div>
                     </div>
                 </div>
-                <div class="head-box" style="width: 100%; justify-content: left;">
+                <div class="head-box" style="width: 100%;">
                     <div style="display: flex; width: 350px;">
                         <div class="bolder">Signature of the Principal</div>
                         <div class="line" style="flex: 1"></div>
                     </div>
                     <div style="display:flex; width: 150px;">
-                        <div class="bolder">DATE</div>
+                        <div class="bolder">Date</div>
                         <div class="line" style="flex: 1"></div>
+                    </div>
+                    <div style="display:flex; width: 150px; justify-content: end;">
+                        <div class="bolder">College Seal</div>
                     </div>
                 </div>
             `;
