@@ -16,6 +16,11 @@
                 semester: window.SEMESTER,
                 year: window.YEAR
             };
+            
+            // make sure engineering is present in title
+            if (docInfo.branch === "Electronics and Telecommunication") {
+                docInfo.branch = docInfo.branch + " Engineering";
+            }
 
             function validatedValue(val) {
                 return val && val !== "--" ? val : "";
