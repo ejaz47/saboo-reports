@@ -87,9 +87,14 @@
 .header-table tr.prn-absolute {
     position: absolute;
     right: 0;
-    bottom: -4px;
+    bottom: 0px;
 }
-.header-table tr.prn-absolute .key{
+.header-table tr.u-prn-absolute {
+    position: absolute;
+    right: 0;
+    bottom: 27px;
+}
+.header-table tr.prn-absolute .key, .header-table tr.u-prn-absolute .key{
     padding-right: 10px;
 }
 

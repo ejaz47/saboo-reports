@@ -152,6 +152,12 @@ table tr td {
     padding: 3px 0px;
     padding-left: 80px;
 }
+.subpage .main .content .block .block-header .block-title {
+    display: flex;
+}
+.subpage .main .content .block .block-header .block-title > div {
+    margin-right: 35px;
+}
 
 
 /* sub-header AND block-content*/

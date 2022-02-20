@@ -109,16 +109,12 @@ function GazzetGenerator() {
             return `
                 <div class="block">
                     <div class="block-header">
-                        <table style="text-align: left">
-                            <tr>
-                                <td width="50px">PRN No: </td>
-                                <td width="70px" style="padding-right: 20px;">${student.prn_no}</td>
-                                <td width="50px">Seat No: </td>
-                                <td width="70px">${student.seat_no}</td>
-                                <td width="40px">Name:</td>
-                                <td>${student.name}</td>
-                            </tr>
-                        </table>
+                        <div class="block-title">
+                            <div>C-PRN No: ${student.prn_no}</div>
+                            ${student.u_prn_no ? "<div>U-PRN No: " + student.u_prn_no + "</div>" : ""}
+                            <div>Seat No: ${student.seat_no}</div> 
+                            <div>Name: ${student.name}</div> 
+                        </div>
                     </div>
                     <div class="block-content">
                         <div class="left"></div>
@@ -657,7 +653,15 @@ function MarksheetGererator () {
                 </div>
             `;
         },
-        header: ({title, year}, {seat_no, prn_no, name}) => {
+        header: ({title, year}, {seat_no, prn_no, name, u_prn_no}) => {
+            let uPrnHtml = "";
+            if (u_prn_no) {
+                uPrnHtml = `<tr class="u-prn-absolute">
+                                <th class="key">Prn No</th>
+                                <th class="divider">:</th>
+                                <th class="value">${u_prn_no}</th>
+                            </tr>`;
+            }
             return `
                 <table class="header-table">
                     <thead>
@@ -689,6 +693,7 @@ function MarksheetGererator () {
                             <th class="divider">:</th>
                             <th class="value">${prn_no}</th>
                         </tr>
+                        ${uPrnHtml}
                     </thead>
                 </table>
             `;
