@@ -110,7 +110,7 @@ function GazzetGenerator() {
                 <div class="block">
                     <div class="block-header">
                         <div class="block-title">
-                            <div>C-PRN No: ${student.prn_no}</div>
+                            <div>${student.u_prn_no ? "C-" : ""}PRN No: ${student.prn_no}</div>
                             ${student.u_prn_no ? "<div>U-PRN No: " + student.u_prn_no + "</div>" : ""}
                             <div>Seat No: ${student.seat_no}</div> 
                             <div>Name: ${student.name}</div> 
@@ -657,7 +657,7 @@ function MarksheetGererator () {
             let uPrnHtml = "";
             if (u_prn_no) {
                 uPrnHtml = `<tr class="u-prn-absolute">
-                                <th class="key">Prn No</th>
+                                <th class="key">U-Prn No</th>
                                 <th class="divider">:</th>
                                 <th class="value">${u_prn_no}</th>
                             </tr>`;
@@ -689,7 +689,7 @@ function MarksheetGererator () {
                             <th class="value">${seat_no}</th>
                         </tr>
                         <tr class="prn-absolute">
-                            <th class="key">Prn No</th>
+                            <th class="key">${u_prn_no ? "C-" : ""}Prn No</th>
                             <th class="divider">:</th>
                             <th class="value">${prn_no}</th>
                         </tr>
