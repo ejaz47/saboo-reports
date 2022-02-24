@@ -21,6 +21,10 @@
             // make sure engineering is present in title
             if (docInfo.branch === "Electronics and Telecommunication") {
                 docInfo.branch = docInfo.branch + " Engineering";
+            } else {
+                if (docInfo.branch === "Machine Learning") {
+                    docInfo.branch = "Computer Science and Engineering (Artificial Intelligence and Machine Learning)"
+                }
             }
             
             function validatedValue(val) {
